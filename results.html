@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGUS-DL — Résultats détaillés</title>
+<style>
+  :root{--bg:#0b0e14;--panel:#161b28;--panel2:#1c2333;--border:#2a3348;--text:#dbe2f0;--muted:#8b96ad;
+        --accent:#5eead4;--accent2:#818cf8;--warn:#fbbf24;--ok:#4ade80;--danger:#f87171;--code:#0d1117;--strong:#fff;
+        --mono:"Cascadia Code",Consolas,monospace}
+  :root.light{--bg:#f5f7fb;--panel:#fff;--panel2:#e7ecf4;--border:#d3dae6;--text:#1e2534;--muted:#5a6478;
+        --accent:#0d9488;--accent2:#4f46e5;--warn:#b45309;--ok:#15803d;--danger:#dc2626;--strong:#0a0f1a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,sans-serif;line-height:1.65;
+       max-width:980px;margin:0 auto;padding:0 1.5rem 5rem}
+  a{color:var(--accent)}
+  header{padding:1.5rem 0}
+  nav a{margin-right:1rem;font-size:.85rem;color:var(--muted);text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  .byline{color:var(--muted);font-size:.84rem;margin-bottom:1rem}
+  h1{font-size:1.9rem;margin-bottom:.3rem}
+  h2{font-size:1.35rem;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:.4rem;margin-top:2.6rem;margin-bottom:.8rem}
+  h3{font-size:1rem;color:var(--accent2);margin-top:1.6rem;margin-bottom:.5rem}
+  p{margin-bottom:.8rem}
+  .lead{color:var(--muted)}
+  strong{color:var(--strong)}
+  ul,ol{margin:.5rem 0 1rem 1.4rem}
+  li{margin-bottom:.35rem}
+  table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem}
+  th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--border)}
+  th{color:var(--accent);background:var(--panel)}
+  tr:hover td{background:rgba(94,234,212,.03)}
+  code{background:var(--code);padding:.1rem .35rem;border-radius:4px;font-size:.85em;font-family:var(--mono);color:#9ecbff}
+  .na{color:var(--muted);font-family:var(--mono)}
+  .callout{background:var(--panel);border-left:4px solid var(--accent);border-radius:8px;padding:.9rem 1.1rem;margin:1rem 0;font-size:.92rem}
+  .callout.danger{border-left-color:var(--danger)}
+  .callout.warn{border-left-color:var(--warn)}
+  .callout .ct{font-weight:700;margin-bottom:.3rem}
+  .pill{display:inline-block;padding:.2rem .7rem;border-radius:999px;font-size:.78rem;font-weight:600}
+  .pill.ok{background:rgba(74,222,128,.12);color:var(--ok);border:1px solid var(--ok)}
+  .pill.no{background:rgba(248,113,113,.12);color:var(--danger);border:1px solid var(--danger)}
+  .pill.pending{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid var(--warn)}
+  .project-context{border-left:3px solid var(--accent);color:var(--muted);font-size:.84rem;margin:1rem 0;padding:.15rem 0 .15rem 1rem}
+  .project-context strong{color:var(--text)}
+  .theme-toggle{position:fixed;top:1rem;right:1rem;z-index:2;width:2.25rem;height:2.25rem;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--panel);color:var(--text);font-size:1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  figure{margin:1.4rem 0;text-align:center}
+  figure img{max-width:100%;border-radius:8px;border:1px solid var(--border)}
+  figcaption{font-size:.8rem;color:var(--muted);margin-top:.5rem}
+  .placeholder{background:var(--panel);border:1px dashed var(--border);border-radius:10px;padding:2rem 1rem;
+    text-align:center;color:var(--muted);font-size:.85rem;margin:1.2rem 0}
+  .note{font-size:.85rem;color:var(--muted)}
+  footer{color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);padding-top:1.2rem;margin-top:3rem}
+  @media(max-width:700px){
+    body{padding:0 1rem 3rem}
+    h1{font-size:1.45rem}
+    h2{font-size:1.2rem}
+    table{display:block;overflow-x:auto}
+    .theme-toggle{top:.5rem;right:.5rem}
+  }
+</style>
+<script>
+if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.classList.add('light');
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème clair" title="Activer le thème clair">☀</button>
+<header>
+  <nav><a href="research_works.html">← Travaux de recherche</a></nav>
+  <h1>Résultats — gradation du syndrome de Sjögren</h1>
+  <p class="byline">Travaux de recherche réalisés par <strong>Houssem Eddine Lassoued</strong>,
+  encadré par <strong>Dr. Anis Ben Aicha</strong> et <strong>Pr. Habib Fathallah</strong>.</p>
+  <p class="lead">Toutes les mesures produites par le projet, étape par étape : contrôles du pipeline de
+  données, classification des grades De Vita 0-3, robustesse inter-appareils, explicabilité, et
+  alignement vision-langage. Chaque chiffre de cette page doit provenir d'un
+  <code>outputs/&lt;run_id&gt;/metrics.json</code> tracé — aucune valeur recopiée de mémoire.</p>
+  <div class="project-context">
+    <strong>Contexte du projet.</strong> Travaux de thèse en Machine Learning et Deep Learning appliqués
+    aux maladies auto-immunes. Corpus HarmonicSS SGUS : 225 images d'échographie des glandes salivaires,
+    annotées selon le score De Vita (grades 0 à 3).<br>
+    Méthodologie et justification des choix : voir <a href="research_works.html">Travaux de recherche</a>.
+  </div>
+</header>
+
+<div class="callout warn">
+  <div class="ct"><span class="pill pending">aucune mesure</span> État de cette page</div>
+  Aucun modèle n'a encore été entraîné. Les tableaux ci-dessous sont la structure d'accueil des résultats :
+  les colonnes, les métriques et les conditions d'évaluation sont fixées <strong>avant</strong> la première
+  mesure, précisément pour ne pas pouvoir être ajustées après coup en fonction de ce qui sortira.
+  Les seules valeurs chiffrées présentes à ce stade sont <strong>analytiques</strong> — calculées
+  directement depuis la distribution du corpus, sans aucun apprentissage.
+</div>
+
+<!-- ══════════════ PROTOCOLE ══════════════ -->
+<h2>Protocole de mesure</h2>
+<p>Conditions d'évaluation fixées à l'ouverture du projet. Toute mesure reportée ici les respecte,
+ou indique explicitement en quoi elle s'en écarte.</p>
+
+<table>
+<tr><th>#</th><th>Règle</th><th>Application</th></tr>
+<tr><td>P1</td><td>Découpage <strong>groupé par patient</strong></td><td>Aucune image d'un même patient de part et d'autre du découpage — identité reconstituée depuis centre + sexe + âge + durée de maladie</td></tr>
+<tr><td>P2</td><td>Stratification par grade</td><td>Les quatre grades sont représentés dans chaque pli</td></tr>
+<tr><td>P3</td><td>Validation croisée <em>k</em>-fold</td><td>Performance moyenne et dispersion inter-plis, jamais un split unique</td></tr>
+<tr><td>P4</td><td>Intervalles de confiance bootstrap</td><td>Rééchantillonnage au niveau patient, 95 %</td></tr>
+<tr><td>P5</td><td>Métrique de sélection : <strong>F1 macro</strong></td><td>L'accuracy est rapportée pour référence, jamais utilisée pour choisir un modèle</td></tr>
+<tr><td>P6</td><td>Test consulté une seule fois</td><td>En fin d'étape, après figement de toutes les décisions</td></tr>
+<tr><td>P7</td><td>Graines fixées et reportées</td><td>Reproductibilité — la variance entre découpages est forte sur 225 images</td></tr>
+</table>
+
+<h3>Référence de base — le classifieur trivial</h3>
+<p>Prédicteur qui répond systématiquement le grade majoritaire. Valeurs <strong>analytiques</strong>,
+dérivées de la distribution du corpus (110 / 28 / 55 / 32), sans aucun entraînement.
+Tout modèle doit être comparé à cette ligne.</p>
+
+<table>
+<tr><th>Modèle</th><th>Accuracy</th><th>F1 macro</th><th>Sensibilité grade 1</th><th>Sensibilité grade 2</th><th>Sensibilité grade 3</th><th>Source</th></tr>
+<tr><td><em>Trivial — toujours grade 0</em></td><td>0,489</td><td><strong>0,164</strong></td><td>0,000</td><td>0,000</td><td>0,000</td><td>analytique</td></tr>
+</table>
+
+<div class="callout">
+  <div class="ct">📌 Pourquoi cette ligne est la plus importante de la page</div>
+  L'écart entre <strong>0,489 d'accuracy</strong> et <strong>0,164 de F1 macro</strong> pour un modèle qui
+  n'a rien appris est la démonstration la plus directe que l'accuracy est trompeuse sur ce corpus.
+  Un modèle annoncé à « 65 % d'accuracy » n'a rien prouvé tant que son F1 macro n'est pas comparé
+  à 0,164 — et tant qu'on ne sait pas s'il détecte un seul grade 1.
+</div>
+
+<!-- ══════════════ ÉTAPE 1 ══════════════ -->
+<h2>Étape 1 — Contrôles du pipeline de données</h2>
+<p class="byline"><span class="pill pending">en attente</span></p>
+<p>Ces contrôles ne sont pas des résultats de performance : ce sont les <strong>garanties</strong> sans
+lesquelles aucun chiffre des étapes suivantes n'est interprétable.</p>
+
+<h3>Intégrité du découpage</h3>
+<table>
+<tr><th>Contrôle</th><th>Attendu</th><th>Mesuré</th><th>Statut</th></tr>
+<tr><td>Patients reconstitués depuis le CSV</td><td>&lt; 225 (images &gt; patients)</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Patients présents en train ET en test</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Grades représentés dans chaque pli</td><td>4 / 4</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Images perdues au prétraitement</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+</table>
+
+<h3>Masquage de la région d'intérêt</h3>
+<table>
+<tr><th>Appareil</th><th>Images</th><th>Surface ROI moyenne (% de l'image)</th><th>Incrustations détectées</th><th>Échecs de masquage</th></tr>
+<tr><td>Samsung (Udine)</td><td>75</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>GE (Belgrade)</td><td>53</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>Philips (Ljubljana)</td><td>50</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>Esaote (Milan)</td><td>47</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+</table>
+<p class="note">Le masquage est validé par revue visuelle d'un échantillon par appareil, jointe ci-dessous
+une fois produite. Un taux d'échec non nul doit être reporté, pas corrigé silencieusement.</p>
+
+<div class="placeholder">Planche de contrôle visuel des ROI — à produire à l'Étape 1</div>
+
+<h3>Descripteurs de texture — séparabilité brute</h3>
+<p>Avant tout apprentissage profond : les descripteurs GLCM et LBP séparent-ils déjà les grades ?
+Cette mesure dit si le feature engineering porte du signal par lui-même.</p>
+<table>
+<tr><th>Descripteur</th><th>Grade 0</th><th>Grade 1</th><th>Grade 2</th><th>Grade 3</th><th>p (Kruskal-Wallis)</th></tr>
+<tr><td>GLCM — contraste</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>GLCM — homogénéité</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>GLCM — entropie</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>LBP — uniformité</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>Densité de coins Harris</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+</table>
+
+<!-- ══════════════ ÉTAPE 2 ══════════════ -->
+<h2>Étape 2 — Classification des grades</h2>
+<p class="byline"><span class="pill pending">en attente</span></p>
+
+<h3>Tâche principale — multiclasse, 4 grades De Vita</h3>
+<p>Validation croisée <em>k</em>-fold groupée par patient. Moyenne ± écart-type inter-plis,
+intervalles de confiance bootstrap à 95 %.</p>
+<table>
+<tr><th>Modèle</th><th>Entrée</th><th>F1 macro [IC 95 %]</th><th>Accuracy</th><th>AUC (OvR)</th><th>run_id</th></tr>
+<tr><td>CNN from scratch</td><td>image seule</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>CNN from scratch</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet18</td><td>image seule</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet18</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet50</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ViT</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td><em>Trivial — toujours grade 0</em></td><td>—</td><td>0,164</td><td>0,489</td><td>0,500</td><td>analytique</td></tr>
+</table>
+<p class="note">La comparaison « image seule » contre « image + texture » sur une même architecture est
+la mesure directe de l'apport du feature engineering — première contribution revendiquée du projet.</p>
+
+<h3>Performance par grade — le détail qui compte</h3>
+<table>
+<tr><th>Grade</th><th>Images</th><th>Sensibilité</th><th>Spécificité</th><th>F1</th><th>Confusion dominante</th></tr>
+<tr><td>0 — normal</td><td>110</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>1 — léger</td><td>28</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>2 — modéré</td><td>55</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>3 — sévère</td><td>32</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+</table>
+<p class="note">Le grade 1 (28 images) est le point de rupture attendu du système. Une sensibilité
+effondrée sur ce grade, malgré un F1 macro correct, doit être reportée explicitement et non noyée
+dans la moyenne.</p>
+
+<div class="placeholder">Matrice de confusion 4 × 4 — à produire à l'Étape 2</div>
+
+<h3>Tâche complémentaire — binaire, sain vs atteint</h3>
+<p>Regroupement des grades 1-2-3. Étude secondaire, pour situer la difficulté relative des deux tâches.</p>
+<table>
+<tr><th>Modèle</th><th>F1 [IC 95 %]</th><th>Sensibilité</th><th>Spécificité</th><th>AUC</th><th>run_id</th></tr>
+<tr><td>ResNet18</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ViT</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+</table>
+
+<h3>Robustesse inter-appareils — leave-one-center-out</h3>
+<p>Entraînement sur trois centres, test sur le quatrième, jamais vu. Mesure directe du risque
+que le modèle ait appris la signature de l'échographe plutôt que la pathologie.</p>
+<table>
+<tr><th>Centre exclu (appareil)</th><th>Images test</th><th>F1 macro</th><th>Écart au k-fold</th><th>run_id</th></tr>
+<tr><td>Udine (Samsung)</td><td>75</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>Belgrade (GE)</td><td>53</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>Ljubljana (Philips)</td><td>50</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>Milan (Esaote)</td><td>47</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+</table>
+<p class="note">Un écart important entre la performance en <em>k</em>-fold et en leave-one-center-out est
+le symptôme attendu de la confusion centre/appareil. Cet écart est un résultat en soi, à reporter
+qu'il soit favorable ou non.</p>
+
+<!-- ══════════════ ÉTAPE 3 ══════════════ -->
+<h2>Étape 3 — Explicabilité</h2>
+<p class="byline"><span class="pill pending">en attente</span></p>
+
+<h3>Focus anatomique — recouvrement explication ∩ ROI</h3>
+<p>Fraction ρ de la saillance totale qui tombe à l'intérieur du masque glandulaire.
+ρ proche de 1 : le modèle regarde la glande. ρ faible : il s'appuie sur autre chose.</p>
+<table>
+<tr><th>Modèle</th><th>Prétraitement</th><th>ρ — SHAP</th><th>ρ — LIME</th><th>Concordance SHAP/LIME</th><th>run_id</th></tr>
+<tr><td>ResNet18</td><td>sans masquage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet18</td><td>avec masquage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ViT</td><td>avec masquage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+</table>
+<p class="note">La comparaison « sans masquage » contre « avec masquage » quantifie l'effet de la
+troisième contribution du projet. Si ρ ne progresse pas, le masquage n'a pas rempli son rôle et
+doit être révisé — c'est le sens de la boucle de contrôle décrite dans les travaux de recherche.</p>
+
+<div class="placeholder">Heatmaps SHAP et LIME superposées, par grade — à produire à l'Étape 3</div>
+
+<!-- ══════════════ ÉTAPE 4 ══════════════ -->
+<h2>Étape 4 — Alignement vision-langage (CLIP)</h2>
+<p class="byline"><span class="pill pending">en attente</span></p>
+
+<h3>Classification zero-shot par similarité cosinus</h3>
+<p>Aucun entraînement : chaque image est assignée au grade dont la description clinique a
+l'<em>embedding</em> le plus proche.</p>
+<table>
+<tr><th>Modèle CLIP</th><th>Jeu de prompts</th><th>F1 macro</th><th>Accuracy</th><th>run_id</th></tr>
+<tr><td>CLIP ViT-B/16 (openai)</td><td>lexique v1</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>CLIP ViT-B/16 (openai)</td><td>lexique v2</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td><em>Trivial — toujours grade 0</em></td><td>—</td><td>0,164</td><td>0,489</td><td>analytique</td></tr>
+</table>
+
+<div class="callout">
+  <div class="ct">⚠ Attente déclarée avant mesure</div>
+  CLIP n'a pas vu d'échographies pendant son pré-entraînement. Un résultat zero-shot proche du
+  classifieur trivial est une <strong>issue anticipée</strong> et sera reporté comme telle : elle
+  motiverait le recours à une variante biomédicale ou à un ajustement léger, et non une reformulation
+  après coup de ce qui était attendu. Cette phrase est écrite <em>avant</em> la première mesure.
+</div>
+
+<!-- ══════════════ LIMITES ══════════════ -->
+<h2>Limites et prochaines étapes</h2>
+<ul>
+  <li><strong>Taille du corpus</strong> — 225 images, dont 28 pour le grade 1. Les intervalles de
+  confiance seront larges, et aucune revendication ne pourra reposer sur un écart de quelques points
+  de F1 sans test statistique approprié.</li>
+  <li><strong>Identité patient reconstituée, non fournie</strong> — le regroupement s'appuie sur
+  centre + sexe + âge + durée de maladie. Deux patients d'un même centre partageant ces quatre valeurs
+  seraient fusionnés à tort. Le nombre de patients reconstitués sera reporté à l'Étape 1 pour que cette
+  approximation reste visible.</li>
+  <li><strong>Confusion centre/appareil non éliminable</strong> — chaque centre n'ayant qu'un appareil,
+  aucune analyse ne peut séparer l'effet du site de celui du constructeur. Le leave-one-center-out
+  mesure leur effet combiné, pas chacun séparément.</li>
+  <li><strong>Cible ordinale traitée comme catégorielle</strong> — la perte standard pénalise
+  identiquement une confusion 0↔1 et 0↔3. Une variante ordinale est identifiée comme piste, à évaluer
+  après établissement de la baseline catégorielle.</li>
+  <li><strong>Prochaine étape</strong> — Étape 1 : reconstitution de l'identité patient, découpage
+  groupé, masquage de la ROI, extraction des descripteurs. Les premiers chiffres attendus sur cette page
+  sont les contrôles d'intégrité du découpage.</li>
+</ul>
+
+<!-- ══════════════ JOURNAL DES RUNS ══════════════ -->
+<h2>Journal des runs</h2>
+<p>Un enregistrement par exécution produisant un chiffre affiché sur cette page.</p>
+<table>
+<tr><th>run_id</th><th>Date</th><th>Étape</th><th>Configuration</th><th>Sortie</th></tr>
+<tr><td colspan="5" style="text-align:center;color:var(--muted)">Aucun run enregistré à ce jour.</td></tr>
+</table>
+
+<footer>
+  Source unique admissible d'un chiffre de performance : <code>outputs/&lt;run_id&gt;/metrics.json</code>.
+  Méthodologie, justification des choix et suivi des étapes :
+  <a href="research_works.html">Travaux de recherche</a> · plan de travail : <code>Plan.md</code>.
+  Les valeurs marquées « analytique » sont calculées directement depuis la distribution du corpus,
+  sans apprentissage. Page mise à jour à chaque avancement du projet.
+</footer>
+
+<script>
+const themeBtn = document.getElementById('theme-toggle');
+const updateThemeButton = () => {
+  const light = document.documentElement.classList.contains('light');
+  themeBtn.textContent = light ? '☾' : '☀';
+  themeBtn.setAttribute('aria-label', light ? 'Activer le thème sombre' : 'Activer le thème clair');
+  themeBtn.title = themeBtn.getAttribute('aria-label');
+};
+themeBtn.addEventListener('click', () => {
+  const light = document.documentElement.classList.toggle('light');
+  localStorage.setItem('sgus-theme', light ? 'light' : 'dark');
+  updateThemeButton();
+});
+updateThemeButton();
+</script>
+</body>
+</html>

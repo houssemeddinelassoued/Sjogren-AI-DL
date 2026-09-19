@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGUS-DL — Travaux de recherche · Gradation du syndrome de Sjögren par échographie</title>
+
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+<style>
+:root{
+  --bg:#0b0e14; --bg2:#11151f; --panel:#161b28; --panel2:#1c2333;
+  --border:#2a3348; --text:#dbe2f0; --muted:#8b96ad;
+  --accent:#5eead4; --accent2:#818cf8; --warn:#fbbf24; --danger:#f87171;
+  --ok:#4ade80; --code:#0d1117; --strong:#fff; --group:#59627a;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Cascadia Code", Consolas, monospace;
+}
+:root.light{
+  --bg:#f5f7fb; --bg2:#eef1f6; --panel:#ffffff; --panel2:#e7ecf4;
+  --border:#d3dae6; --text:#1e2534; --muted:#5a6478;
+  --accent:#0d9488; --accent2:#4f46e5; --warn:#b45309; --danger:#dc2626;
+  --ok:#15803d; --strong:#0a0f1a; --group:#8b96ad;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.65}
+
+/* ── layout ── */
+.layout{display:grid; grid-template-columns:260px 1fr; min-height:100vh}
+nav.sidebar{
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  background:var(--bg2); border-right:1px solid var(--border); padding:1.4rem 1rem;
+}
+nav.sidebar .logo{font-size:1.05rem; font-weight:700; letter-spacing:.06em; color:var(--accent); margin-bottom:.2rem}
+nav.sidebar .sub{font-size:.72rem; color:var(--muted); margin-bottom:1.4rem}
+nav.sidebar a{
+  display:block; padding:.5rem .7rem; margin:.15rem 0; border-radius:8px;
+  color:var(--muted); text-decoration:none; font-size:.86rem; transition:.15s;
+}
+nav.sidebar a:hover{background:var(--panel2); color:var(--text)}
+nav.sidebar a.active{background:var(--panel2); color:var(--accent); font-weight:600}
+nav.sidebar .group{font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--group); margin:1.1rem .5rem .3rem}
+.theme-toggle{
+  position:fixed; top:1rem; right:1rem; z-index:5; width:2.25rem; height:2.25rem;
+  padding:0; border:1px solid var(--border); border-radius:50%; background:var(--panel);
+  color:var(--text); font-size:1rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.theme-toggle:hover{border-color:var(--accent); color:var(--accent)}
+/* min-width:0 — sans quoi un élément de grille refuse de descendre
+   sous la largeur de son contenu et déborde la fenêtre */
+main{padding:2.2rem 3rem 6rem; max-width:1100px; min-width:0}
+
+section{margin-bottom:4.5rem; scroll-margin-top:1rem}
+h1{font-size:2rem; margin-bottom:.4rem}
+h2{font-size:1.5rem; color:var(--accent); margin-bottom:1rem; padding-bottom:.4rem; border-bottom:1px solid var(--border)}
+h3{font-size:1.08rem; color:var(--accent2); margin:1.6rem 0 .6rem}
+p{margin-bottom:.8rem}
+.lead{font-size:1.05rem; color:var(--muted)}
+.byline{color:var(--muted); font-size:.84rem; margin-bottom:1rem}
+strong{color:var(--strong)}
+em{color:var(--warn); font-style:normal}
+.project-context{border-left:3px solid var(--accent); color:var(--muted); font-size:.84rem; margin:1rem 0 1.5rem; padding:.15rem 0 .15rem 1rem}
+
+/* ── components ── */
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; margin:1.2rem 0}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.2rem}
+.card .k{font-size:1.5rem; font-weight:700; color:var(--accent)}
+.card .t{font-weight:600; margin-bottom:.35rem; color:var(--strong)}
+.card .d{font-size:.84rem; color:var(--muted)}
+.badge{display:inline-block; font-size:.7rem; padding:.15rem .55rem; border-radius:999px; border:1px solid var(--border); color:var(--muted); margin-right:.35rem}
+.badge.ok{color:var(--ok); border-color:var(--ok)}
+.badge.todo{color:var(--warn); border-color:var(--warn)}
+.badge.core{color:var(--accent); border-color:var(--accent)}
+.badge.wip{color:var(--accent2); border-color:var(--accent2)}
+
+.callout{background:var(--panel); border-left:4px solid var(--accent); border-radius:8px; padding:.9rem 1.1rem; margin:1rem 0; font-size:.92rem}
+.callout.warn{border-left-color:var(--warn)}
+.callout.danger{border-left-color:var(--danger)}
+.callout .ct{font-weight:700; margin-bottom:.25rem}
+
+.explain{background:var(--panel); border:1px solid var(--accent2); border-left:5px solid var(--accent2);
+  border-radius:10px; padding:1rem 1.2rem; margin:1.2rem 0; font-size:.93rem}
+.explain .ct{font-weight:700; color:var(--accent2); margin-bottom:.35rem}
+.explain p{margin-bottom:.55rem}
+.explain p:last-child{margin-bottom:0}
+.explain em{color:var(--accent2); font-style:italic}
+
+table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:.87rem}
+th,td{padding:.55rem .75rem; text-align:left; border-bottom:1px solid var(--border)}
+th{color:var(--accent); font-weight:600; background:var(--panel)}
+tr:hover td{background:rgba(94,234,212,.03)}
+td code, p code, li code{background:var(--code); padding:.1rem .4rem; border-radius:5px; font-family:var(--mono); font-size:.83em; color:#9ecbff}
+
+pre{background:var(--code); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem; overflow-x:auto; margin:.8rem 0; font-size:.8rem; line-height:1.55}
+pre code{font-family:var(--mono); color:#c9d1d9; background:none; padding:0}
+.cm{color:#7d8799}
+.kw{color:#ff7b72}
+.fn{color:#d2a8ff}
+.st{color:#a5d6ff}
+.nb{color:#79c0ff}
+
+.mermaid-box{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1.2rem; margin:1rem 0; overflow-x:auto}
+.mermaid{display:flex; justify-content:center}
+pre.mermaid{background:transparent; border:none; padding:0; margin:0}
+.fig-cap{text-align:center; font-size:.78rem; color:var(--muted); margin-top:.6rem}
+
+ol,ul{margin:.5rem 0 1rem 1.4rem}
+li{margin-bottom:.35rem}
+
+/* ── interactive lab ── */
+.lab{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:1.4rem; margin:1.2rem 0}
+.lab-grid{display:grid; grid-template-columns:280px 1fr; gap:1.6rem}
+@media(max-width:900px){.lab-grid{grid-template-columns:1fr}}
+.ctrl{margin-bottom:1rem}
+.ctrl label{display:flex; justify-content:space-between; font-size:.82rem; color:var(--muted); margin-bottom:.25rem}
+.ctrl label output{color:var(--accent); font-family:var(--mono); font-weight:600}
+input[type=range]{width:100%; accent-color:var(--accent)}
+.gauges{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.8rem; margin-bottom:1rem}
+.gauge{background:var(--panel2); border-radius:10px; padding:.7rem .9rem; border:1px solid var(--border)}
+.gauge .gl{font-size:.72rem; color:var(--muted)}
+.gauge .gv{font-family:var(--mono); font-size:1.25rem; font-weight:700; color:var(--accent)}
+.gauge.hl .gv{color:var(--warn)}
+.bars{display:flex; flex-direction:column; gap:.45rem; margin-top:.6rem}
+.bar-row{display:grid; grid-template-columns:150px 1fr 58px; align-items:center; gap:.6rem; font-size:.78rem}
+.bar-track{height:16px; background:var(--bg); border-radius:8px; overflow:hidden}
+.bar-fill{display:block; height:100%; background:linear-gradient(90deg,var(--accent2),var(--accent)); border-radius:8px; transition:width .12s}
+.bar-val{font-family:var(--mono); color:var(--muted); text-align:right}
+canvas{width:100%; border-radius:10px; background:var(--bg)}
+.seg{display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:1rem}
+.seg-btn{background:var(--panel2); border:1px solid var(--border); color:var(--muted); padding:.35rem .85rem;
+  border-radius:999px; cursor:pointer; font-size:.8rem; font-family:var(--font)}
+.seg-btn.active{color:var(--accent); border-color:var(--accent); background:var(--panel)}
+
+/* tabs */
+.tabs{display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:-1px}
+.tab-btn{background:var(--panel); border:1px solid var(--border); border-bottom:none; color:var(--muted);
+  padding:.45rem 1rem; border-radius:9px 9px 0 0; cursor:pointer; font-size:.82rem; font-family:var(--font)}
+.tab-btn.active{color:var(--accent); background:var(--code)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.tab-panel pre{margin-top:0; border-radius:0 10px 10px 10px}
+
+kbd{background:var(--panel2); border:1px solid var(--border); border-radius:5px; padding:.05rem .4rem; font-size:.78em; font-family:var(--mono)}
+.eq-box{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:.9rem 1.2rem; margin:.8rem 0; overflow-x:auto}
+footer{color:var(--muted); font-size:.78rem; border-top:1px solid var(--border); padding-top:1.2rem; margin-top:3rem}
+
+/* ── écrans étroits : la barre latérale devient un bandeau défilant ── */
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr}
+  nav.sidebar{
+    position:static; height:auto; min-width:0; overflow-x:auto; overflow-y:visible; white-space:nowrap;
+    border-right:none; border-bottom:1px solid var(--border); padding:.9rem 1rem;
+  }
+  nav.sidebar .sub{margin-bottom:.7rem}
+  nav.sidebar .group{display:none}
+  nav.sidebar a{display:inline-block; margin:.15rem .2rem}
+  main{padding:1.5rem 1rem 4rem}
+  h1{font-size:1.5rem}
+  h2{font-size:1.22rem}
+  table{display:block; overflow-x:auto}
+  .lab{padding:1rem}
+  .theme-toggle{top:.5rem; right:.5rem}
+}
+</style>
+<script>
+// Applique le thème sauvegardé avant le premier rendu (évite le flash)
+if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.classList.add('light');
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème clair" title="Activer le thème clair">☀</button>
+<div style="background:#0e1620;color:#5eead4;padding:.6rem 1.2rem;font-size:.85rem;text-align:center;font-family:sans-serif;border-bottom:1px solid #1f293d">
+  Travaux de recherche réalisés par <strong style="color:#fff">Houssem Eddine Lassoued</strong>, encadré par <strong style="color:#fff">Dr. Anis Ben Aicha</strong> et <strong style="color:#fff">Pr. Habib Fathallah</strong>
+  </br>
+  Gradation automatique du syndrome de Gougerot-Sjögren sur échographie des glandes salivaires.
+  Pour les chiffres mesurés, voir la
+  <a href="results.html" style="color:#fff;text-decoration:underline">page résultats</a>.
+</div>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <div class="logo">SGUS-DL</div>
+  <div class="sub">Gradation du syndrome de Sjögren<br>Travaux de recherche</div>
+  <div class="group">Comprendre</div>
+  <a href="#apercu">1 · Vue d'ensemble</a>
+  <a href="#clinique">2 · Cadre clinique</a>
+  <a href="#donnees">3 · Jeu de données</a>
+  <div class="group">Le pipeline</div>
+  <a href="#pipeline">4 · Vue du pipeline</a>
+  <a href="#etape1">5 · Étape 1 — Données &amp; features</a>
+  <a href="#etape2">6 · Étape 2 — Modélisation</a>
+  <a href="#etape3">7 · Étape 3 — Explicabilité</a>
+  <a href="#etape4">8 · Étape 4 — Multimodal CLIP</a>
+  <div class="group">La science</div>
+  <a href="#protocole">9 · Protocole d'évaluation</a>
+  <a href="#integrite">10 · Intégrité scientifique</a>
+  <a href="#statut">11 · Statut &amp; feuille de route</a>
+  <a href="#journal">12 · Journal des travaux</a>
+</nav>
+
+<main>
+
+<!-- ══════════════════ 1. VUE D'ENSEMBLE ══════════════════ -->
+<section id="apercu">
+  <h1>Gradation automatique du syndrome de Sjögren</h1>
+
+  <p class="lead">Prédiction du <strong>stade d'atteinte des glandes salivaires</strong> (score de De Vita,
+  grades 0 à 3) à partir d'images d'échographie, par un pipeline hybride associant
+  <strong>descripteurs de texture classiques</strong>, <strong>réseaux profonds</strong>,
+  <strong>explicabilité multi-méthodes</strong> et <strong>alignement vision-langage</strong>.</p>
+
+  <div class="project-context">
+    Ce document est le <strong>journal de bord technique</strong> du projet : il décrit ce qui est prévu,
+    ce qui est fait, et ce que chaque choix méthodologique cherche à résoudre. Il est mis à jour à chaque
+    étape franchie. Le plan de travail de référence est <code>Plan.md</code>.
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="t">Le problème clinique</div>
+      <div class="d">L'évaluation échographique des glandes salivaires est <strong>semi-quantitative et
+      opérateur-dépendante</strong>. Graduer l'atteinte demande une expertise rare, et la reproductibilité
+      entre praticiens reste imparfaite — d'où l'intérêt d'une aide automatisée et reproductible.</div></div>
+    <div class="card"><div class="t">La tâche visée</div>
+      <div class="d">Non pas un simple « sain vs malade », mais la <strong>prédiction du grade 0-3</strong>.
+      Un problème à quatre classes ordinales, fortement déséquilibré, sur un corpus de
+      <strong>225 images seulement</strong>.</div></div>
+    <div class="card"><div class="t">Le parti pris</div>
+      <div class="d">Ne pas laisser le réseau tout apprendre seul : lui <strong>fournir explicitement</strong>
+      la texture (GLCM, LBP, points d'intérêt), lui <strong>retirer</strong> ce qui n'est pas la glande
+      (incrustations, bords de sonde), puis <strong>vérifier par l'XAI</strong> qu'il regarde au bon endroit.</div></div>
+  </div>
+
+  <div class="explain">
+    <div class="ct">🎓 Ce que « graduer » veut dire concrètement</div>
+    <p>Une glande salivaire saine apparaît à l'échographie comme un tissu <em>homogène</em> : une texture
+    régulière, une teinte uniforme. À mesure que la maladie progresse, le tissu se désorganise —
+    des zones sombres (<em>anéchoïques</em>, remplies de liquide ou infiltrées) apparaissent, la texture
+    devient hétérogène, les contours de la glande se brouillent.</p>
+    <p>Le score de De Vita résume cette dégradation en quatre paliers, de 0 (glande normale) à 3 (atteinte
+    sévère). La difficulté du problème tient à ce que la frontière entre deux grades voisins est
+    <em>graduelle</em> : un grade 1 et un grade 2 se ressemblent bien davantage qu'un grade 0 et un grade 3.
+    C'est pourquoi la matrice de confusion par grade est, pour ce projet, plus informative qu'un score global.</p>
+  </div>
+
+  <h3>Les cinq contributions visées</h3>
+  <table>
+    <tr><th>#</th><th>Contribution</th><th>Étape</th><th>Statut</th></tr>
+    <tr><td>1</td><td><strong>Pipeline hybride</strong> — injection de descripteurs de texture explicites (GLCM, LBP) et de points d'intérêt en complément de l'image brute</td><td>1</td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>2</td><td><strong>Classification multiclasse</strong> des 4 grades De Vita, et non une détection binaire</td><td>2</td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>3</td><td><strong>Isolement de la région d'intérêt</strong> — neutralisation des artefacts d'acquisition</td><td>1</td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>4</td><td><strong>Explicabilité multi-méthodes</strong> — SHAP et LIME confrontés pour valider le focus anatomique</td><td>3</td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>5</td><td><strong>Alignement vision-langage</strong> — CLIP, ouvrant la voie à une architecture RAG</td><td>4</td><td><span class="badge todo">à faire</span></td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 2. CADRE CLINIQUE ══════════════════ -->
+<section id="clinique">
+  <h2>2 · Cadre clinique — ce que l'image contient</h2>
+
+  <p>Le syndrome de Gougerot-Sjögren est une maladie auto-immune qui attaque les glandes exocrines,
+  au premier rang desquelles les glandes salivaires. L'infiltration lymphocytaire progressive du
+  parenchyme se traduit à l'échographie par une <strong>signature essentiellement texturale</strong>.</p>
+
+  <h3>2.1 Sémiologie échographique</h3>
+  <table>
+    <tr><th>Signe</th><th>Traduction visuelle</th><th>Conséquence pour le modèle</th></tr>
+    <tr><td>Hétérogénéité du parenchyme</td><td>Alternance désordonnée de zones claires et sombres</td><td>Cible directe des descripteurs GLCM (contraste, homogénéité, entropie)</td></tr>
+    <tr><td>Zones anéchoïques / hypoéchoïques</td><td>Plages sombres bien délimitées dans le tissu</td><td>Motifs locaux détectables par LBP et par les cartes d'activation convolutionnelles</td></tr>
+    <tr><td>Perte de définition des contours</td><td>Frontière glande / tissu environnant floue</td><td>Détection de coins et de points d'intérêt structurels</td></tr>
+    <tr><td>Hypertrophie ou atrophie glandulaire</td><td>Variation de taille globale</td><td>Information d'échelle — sensible au réglage de l'appareil, donc à manier avec prudence</td></tr>
+  </table>
+
+  <h3>2.2 Le score de De Vita (0-3)</h3>
+  <p>Score semi-quantitatif de référence, gradant l'atteinte parenchymateuse par paliers. C'est la
+  <strong>variable cible</strong> du projet. Le jeu de données fournit également le score OMERACT,
+  qui pourra servir de cible secondaire ou de contrôle de cohérence.</p>
+
+  <div class="callout warn">
+    <div class="ct">⚠ Une cible ordinale traitée comme catégorielle</div>
+    Les grades 0 &lt; 1 &lt; 2 &lt; 3 sont <strong>ordonnés</strong> : confondre un grade 3 avec un grade 0
+    est une erreur bien plus grave que de le confondre avec un grade 2. Une <code>CrossEntropyLoss</code>
+    standard ignore cet ordre et pénalise identiquement les deux cas. Ce point est consigné comme
+    <strong>piste d'amélioration</strong> pour l'Étape 2 (régression ordinale, ou perte pondérée par la
+    distance entre grades), à évaluer une fois la baseline catégorielle établie.
+  </div>
+</section>
+
+<!-- ══════════════════ 3. DONNÉES ══════════════════ -->
+<section id="donnees">
+  <h2>3 · Jeu de données — HarmonicSS SGUS benchmark</h2>
+
+  <p>Corpus public issu d'une étude de fiabilité multicentrique européenne
+  (<a href="https://doi.org/10.3389/fmed.2020.581248" style="color:var(--accent2)">doi:10.3389/fmed.2020.581248</a>),
+  présent dans <code>HarmonicSS benchmark dataset/</code>.</p>
+
+  <div class="cards">
+    <div class="card"><div class="k">225</div><div class="t">images</div>
+      <div class="d">JPG, <code>001.jpg</code> … <code>225.jpg</code>, indexées par la colonne
+      <code>Anonymized ID</code> du CSV (séparateur <code>;</code>).</div></div>
+    <div class="card"><div class="k">4</div><div class="t">grades cibles</div>
+      <div class="d">Score De Vita 0-3, plus le score OMERACT en annotation secondaire.</div></div>
+    <div class="card"><div class="k">4</div><div class="t">centres · 4 appareils</div>
+      <div class="d">Udine, Belgrade, Ljubljana, Milan — chacun avec un constructeur d'échographe différent.</div></div>
+  </div>
+
+  <h3>3.1 Répartition réelle du corpus</h3>
+  <p>Chiffres mesurés directement sur <code>Anonymized images - Info.csv</code>. Sélectionnez une
+  variable pour en voir la distribution.</p>
+
+  <div class="lab">
+    <div class="seg" id="dist-seg">
+      <button class="seg-btn active" data-dist="grade" type="button">Grade De Vita</button>
+      <button class="seg-btn" data-dist="centre" type="button">Centre</button>
+      <button class="seg-btn" data-dist="appareil" type="button">Appareil</button>
+      <button class="seg-btn" data-dist="glande" type="button">Type de glande</button>
+    </div>
+    <canvas id="distCanvas" height="260" aria-label="Distribution du jeu de données"></canvas>
+    <div class="fig-cap" id="dist-cap">Fig. 1 — Distribution des grades De Vita sur les 225 images.</div>
+  </div>
+
+  <h3>3.2 Trois contraintes structurelles imposées par ces données</h3>
+  <p>Ces trois points ne sont pas des détails d'implémentation : ils conditionnent la validité de
+  l'ensemble des résultats et sont traités explicitement dès l'Étape 1.</p>
+
+  <div class="callout danger">
+    <div class="ct">🩸 Contrainte 1 — Fuite de données entre patients</div>
+    Parotide et sous-mandibulaire d'un <strong>même patient</strong> figurent sur deux lignes distinctes
+    du CSV (mêmes centre, sexe, âge et durée de maladie). Aucun identifiant patient n'est fourni :
+    il doit être <strong>reconstitué</strong> à partir de ces colonnes. Sans regroupement, deux images
+    du même patient peuvent se retrouver de part et d'autre du découpage train/test — le modèle
+    reconnaît alors le patient plutôt que la pathologie, et <strong>toutes les métriques sont
+    artificiellement gonflées</strong>. C'est le piège le plus coûteux du projet.
+  </div>
+
+  <div class="callout warn">
+    <div class="ct">⚠ Contrainte 2 — Confusion centre / appareil</div>
+    Chaque centre n'utilise qu'un seul échographe : Udine-Samsung (75), Belgrade-GE (53),
+    Ljubljana-Philips (50), Milan-Esaote (47). La signature visuelle du constructeur — gamme de gris,
+    incrustations, format d'image — est donc <strong>parfaitement corrélée au centre</strong>.
+    Le modèle peut apprendre à reconnaître l'appareil au lieu de la maladie. Contre-mesures :
+    normalisation d'intensité, masquage des incrustations, et test de robustesse
+    <em>leave-one-center-out</em>.
+  </div>
+
+  <div class="callout">
+    <div class="ct">📉 Contrainte 3 — Déséquilibre de classes</div>
+    Le grade 0 représente près de la moitié du corpus (110 images) tandis que le grade 1 n'en compte
+    que <strong>28</strong>. Un classifieur qui prédirait systématiquement « grade 0 » atteindrait
+    déjà 48,9 % d'accuracy sans rien apprendre. D'où le choix du <strong>F1 macro</strong> comme
+    métrique de sélection, et d'une perte pondérée — explorée ci-dessous.
+  </div>
+
+  <h3>3.3 Laboratoire — calibrer la pondération des classes</h3>
+  <p>Deux stratégies classiques pour compenser le déséquilibre. Les poids ci-dessous sont calculés
+  sur les <strong>effectifs réels</strong> du corpus.</p>
+
+  <div class="eq-box">
+  $$w_k^{\text{inv}} = \frac{N}{K \cdot n_k}
+  \qquad\qquad
+  w_k^{\text{eff}} \propto \frac{1-\beta}{1-\beta^{\,n_k}}$$
+  </div>
+
+  <div class="lab">
+    <div class="lab-grid">
+      <div>
+        <div class="ctrl">
+          <label for="beta">β — nombre effectif d'échantillons <output id="o-beta">0.99</output></label>
+          <input type="range" id="beta" min="0" max="0.9999" step="0.0001" value="0.99">
+        </div>
+        <div class="ctrl">
+          <label for="strat">Stratégie</label>
+          <div class="seg" id="strat-seg">
+            <button class="seg-btn" data-strat="none" type="button">Aucune</button>
+            <button class="seg-btn active" data-strat="inv" type="button">Inverse</button>
+            <button class="seg-btn" data-strat="eff" type="button">Effectif</button>
+          </div>
+        </div>
+        <div class="gauges">
+          <div class="gauge"><div class="gl">Ratio max/min</div><div class="gv" id="gRatio">—</div></div>
+          <div class="gauge"><div class="gl">Accuracy « tout grade 0 »</div><div class="gv" id="gNaive">48.9%</div></div>
+        </div>
+        <p style="font-size:.82rem;color:var(--muted)">β proche de 0 ramène vers une pondération neutre ;
+        β proche de 1 tend vers la pondération inverse pure. Le réglage courant en imagerie médicale
+        se situe entre 0,99 et 0,9999.</p>
+      </div>
+      <div>
+        <div class="bars" id="weightBars"></div>
+        <div class="fig-cap">Fig. 2 — Poids appliqués à chaque grade dans la fonction de perte.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="explain">
+    <div class="ct">🎓 Pourquoi pondérer change tout ici</div>
+    <p>Sans pondération, le grade 1 (28 images) contribue quatre fois moins au gradient que le grade 0
+    (110 images) : le réseau a tout intérêt à <em>l'ignorer purement et simplement</em>. Il apprend alors
+    un raccourci — « dans le doute, réponds 0 » — qui maximise l'accuracy tout en étant cliniquement
+    inutile, puisque manquer une atteinte débutante est précisément l'erreur à éviter.</p>
+    <p>La pondération rééquilibre artificiellement cette contribution. Le <em>nombre effectif</em>
+    (Cui et al., 2019) raffine l'idée : au-delà d'un certain volume, les images supplémentaires d'une
+    même classe s'informent mutuellement et apportent de moins en moins de nouveauté — le poids ne doit
+    donc pas décroître aussi vite que l'inverse de l'effectif.</p>
+  </div>
+</section>
+
+<!-- ══════════════════ 4. PIPELINE ══════════════════ -->
+<section id="pipeline">
+  <h2>4 · Vue du pipeline — les quatre étapes</h2>
+
+  <div class="mermaid-box">
+  <pre class="mermaid">
+flowchart LR
+  subgraph E1["① Données &amp; features"]
+    RAW["Image brute<br>SGUS"] --> ROI["Masquage ROI<br>+ normalisation"]
+    ROI --> FEAT["GLCM · LBP<br>coins Harris"]
+    ROI --> AUG["Augmentation"]
+    FEAT --> DS["SjogrenDataset<br>tenseur multi-canaux"]
+    AUG --> DS
+  end
+  subgraph E2["② Modélisation"]
+    DS --> CNN["CNN scratch"]
+    DS --> RES["ResNet18/50"]
+    DS --> VIT["ViT"]
+  end
+  subgraph E3["③ Explicabilité"]
+    RES --> SHAP["SHAP"]
+    RES --> LIME["LIME"]
+    SHAP --> VAL["Recouvrement<br>explication ∩ ROI"]
+    LIME --> VAL
+  end
+  subgraph E4["④ Multimodal"]
+    ROI --> CLIP["CLIP gelé"]
+    TXT["Lexique clinique<br>grades 0-3"] --> CLIP
+    CLIP --> SIM["Similarité cosinus<br>zero-shot"]
+  end
+  style E1 fill:#14532d,stroke:#4ade80,color:#dbe2f0
+  style E2 fill:#1e2a4a,stroke:#818cf8,color:#dbe2f0
+  style E3 fill:#3a2d14,stroke:#fbbf24,color:#dbe2f0
+  style E4 fill:#2a1f3d,stroke:#a78bfa,color:#dbe2f0
+  </pre>
+  <div class="fig-cap">Fig. 3 — Chaîne complète, de l'image brute à l'alignement vision-langage.</div>
+  </div>
+
+  <h3>Arborescence de code prévue</h3>
+  <p><span class="badge todo">aucun module encore écrit</span> — structure cible, à créer au fil des étapes.</p>
+  <pre><code><span class="cm"># structure prévue — sera créée progressivement</span>
+sjogren/
+├── data/
+│   ├── metadata.py      <span class="cm"># lecture CSV, reconstitution de l'identité patient</span>
+│   ├── splits.py        <span class="cm"># découpage groupé par patient, k-fold, leave-one-center-out</span>
+│   ├── preprocess.py    <span class="cm"># masquage ROI, suppression des incrustations, normalisation</span>
+│   └── dataset.py       <span class="cm"># SjogrenDataset (PyTorch)</span>
+├── features/
+│   ├── texture.py       <span class="cm"># GLCM, LBP</span>
+│   └── keypoints.py     <span class="cm"># Harris / Shi-Tomasi</span>
+├── models/
+│   ├── baseline_cnn.py  <span class="cm"># CNN from scratch</span>
+│   ├── resnet.py        <span class="cm"># transfer learning</span>
+│   └── vit.py           <span class="cm"># Vision Transformer</span>
+├── train/
+│   ├── loop.py          <span class="cm"># boucle d'entraînement, AdamW, perte pondérée</span>
+│   └── metrics.py       <span class="cm"># F1 macro, sensibilité, spécificité, bootstrap</span>
+├── xai/
+│   ├── shap_maps.py
+│   ├── lime_maps.py
+│   └── overlap.py       <span class="cm"># recouvrement explication ∩ ROI</span>
+└── multimodal/
+    ├── prompts.py       <span class="cm"># lexique clinique par grade</span>
+    └── clip_infer.py    <span class="cm"># embeddings, similarité cosinus</span></code></pre>
+</section>
+
+<!-- ══════════════════ 5. ÉTAPE 1 ══════════════════ -->
+<section id="etape1">
+  <h2>5 · Étape 1 — Ingénierie des caractéristiques &amp; pipeline de données</h2>
+  <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">étape courante</span></p>
+
+  <p><strong>Objectif</strong> — construire un <code>DataLoader</code> robuste qui présente au réseau
+  la texture glandulaire, et rien d'autre.</p>
+
+  <h3>5.1 Ordre des opérations</h3>
+  <div class="mermaid-box">
+  <pre class="mermaid">
+flowchart TB
+  A["CSV métadonnées"] --> B["Reconstitution identité patient<br>centre + sexe + âge + durée"]
+  B --> C["Découpage groupé par patient<br>StratifiedGroupKFold"]
+  D["Image 001.jpg"] --> E["Détection des incrustations<br>texte, bords de sonde"]
+  E --> F["Crop ROI + masquage"]
+  F --> G["Normalisation d'intensité<br>inter-appareils"]
+  G --> H1["Canal 0 : image"]
+  G --> H2["Canal 1-n : GLCM"]
+  G --> H3["Canal n+1 : LBP"]
+  G --> H4["Canal n+2 : carte de coins"]
+  H1 --> I["Tenseur multi-canaux"]
+  H2 --> I
+  H3 --> I
+  H4 --> I
+  C --> I
+  I --> J["SjogrenDataset<br>+ augmentation"]
+  style C fill:#4a1d1d,stroke:#f87171,color:#dbe2f0
+  style F fill:#14532d,stroke:#4ade80,color:#dbe2f0
+  </pre>
+  <div class="fig-cap">Fig. 4 — Le découpage groupé (rouge) et le masquage (vert) sont les deux points critiques.</div>
+  </div>
+
+  <h3>5.2 Descripteurs de texture</h3>
+  <p>La <strong>matrice de co-occurrence des niveaux de gris</strong> (GLCM) compte les paires de pixels
+  séparés d'un déplacement donné. Les propriétés qu'on en extrait quantifient directement
+  l'hétérogénéité recherchée :</p>
+
+  <div class="eq-box">
+  $$\text{Contraste} = \sum_{i,j}(i-j)^2 P(i,j)
+  \qquad
+  \text{Homogénéité} = \sum_{i,j}\frac{P(i,j)}{1+|i-j|}$$
+  </div>
+
+  <p>Le <strong>motif binaire local</strong> (LBP) encode, pour chaque pixel, le signe de l'écart
+  d'intensité avec ses $P$ voisins situés à distance $R$ — une signature de micro-texture robuste
+  aux variations d'éclairage, donc partiellement aux réglages de l'appareil :</p>
+
+  <div class="eq-box">
+  $$\text{LBP}_{P,R}(x_c) = \sum_{p=0}^{P-1} s(g_p - g_c)\,2^p,
+  \qquad s(u) = \begin{cases}1 & u \ge 0\\ 0 & u < 0\end{cases}$$
+  </div>
+
+  <p>La <strong>réponse de Harris</strong> repère les points où l'intensité varie fortement dans
+  les deux directions — utile pour accrocher les structures anatomiques et les frontières glandulaires :</p>
+
+  <div class="eq-box">
+  $$R = \det(M) - k\,(\operatorname{tr} M)^2$$
+  </div>
+
+  <h3>5.3 Livrables de l'étape</h3>
+  <table>
+    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
+    <tr><td>Lecture du CSV et reconstitution de l'identité patient</td><td><code>data/metadata.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Découpage groupé par patient, stratifié par grade</td><td><code>data/splits.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Masquage des incrustations et crop de la ROI</td><td><code>data/preprocess.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Extraction GLCM et LBP</td><td><code>features/texture.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Détection de coins Harris / Shi-Tomasi</td><td><code>features/keypoints.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td><code>SjogrenDataset</code> et augmentations</td><td><code>data/dataset.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="ct">✔ Critère de sortie de l'étape</div>
+    Un <code>DataLoader</code> qui produit des lots de tenseurs multi-canaux, avec la garantie vérifiée
+    par test qu'<strong>aucun patient n'apparaît simultanément en train et en test</strong>, et une
+    planche de contrôle visuel montrant les ROI extraites sur un échantillon des quatre appareils.
+  </div>
+</section>
+
+<!-- ══════════════════ 6. ÉTAPE 2 ══════════════════ -->
+<section id="etape2">
+  <h2>6 · Étape 2 — Modélisation profonde</h2>
+  <p class="byline"><span class="badge todo">à faire</span></p>
+
+  <p><strong>Objectif</strong> — comparer trois familles d'architectures sur la tâche multiclasse
+  des grades De Vita, avec la configuration binaire en étude complémentaire.</p>
+
+  <h3>6.1 Les trois architectures et ce qu'elles testent</h3>
+  <table>
+    <tr><th>Modèle</th><th>Rôle dans l'étude</th><th>Hypothèse testée</th></tr>
+    <tr><td><strong>CNN from scratch</strong><br>3 à 5 couches conv.</td><td>Référence interne</td><td>Quelle performance atteint-on sans connaissance externe, sur 225 images seulement ?</td></tr>
+    <tr><td><strong>ResNet18 / ResNet50</strong><br>pré-entraîné ImageNet</td><td>Bras principal</td><td>Le transfert depuis les images naturelles compense-t-il la petite taille du corpus ?</td></tr>
+    <tr><td><strong>ViT</strong><br>pré-entraîné</td><td>Comparaison d'état de l'art</td><td>L'attention globale capture-t-elle l'hétérogénéité mieux que les convolutions locales ?</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <div class="ct">⚠ 225 images, des millions de paramètres</div>
+    Le rapport entre la taille du corpus et la capacité des modèles pré-entraînés rend le
+    <strong>surapprentissage quasi certain</strong> sans précautions : gel partiel des couches basses,
+    augmentation soutenue, arrêt anticipé sur le F1 macro de validation, et régularisation.
+    Le CNN from scratch, plus petit, sert justement de point de comparaison sur ce terrain.
+  </div>
+
+  <h3>6.2 Fonction de perte et sélection de modèle</h3>
+  <div class="eq-box">
+  $$\mathcal{L} = -\sum_{k=0}^{K-1} w_k \, y_k \log \hat{p}_k
+  \qquad
+  \text{F1}_{\text{macro}} = \frac{1}{K}\sum_{k=0}^{K-1} \frac{2\,\mathrm{TP}_k}{2\,\mathrm{TP}_k + \mathrm{FP}_k + \mathrm{FN}_k}$$
+  </div>
+  <p>Optimiseur <strong>AdamW</strong>, poids $w_k$ calibrés selon la section 3.3. Le modèle retenu
+  est celui qui maximise le <strong>F1 macro</strong> en validation — jamais l'accuracy, qui récompense
+  le raccourci « tout grade 0 ».</p>
+
+  <h3>6.3 Livrables de l'étape</h3>
+  <table>
+    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
+    <tr><td>CNN from scratch</td><td><code>models/baseline_cnn.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>ResNet18/50 adapté multiclasse et binaire</td><td><code>models/resnet.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Vision Transformer</td><td><code>models/vit.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Boucle d'entraînement, AdamW, perte pondérée</td><td><code>train/loop.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Métriques, bootstrap, matrice de confusion</td><td><code>train/metrics.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 7. ÉTAPE 3 ══════════════════ -->
+<section id="etape3">
+  <h2>7 · Étape 3 — Explicabilité, casser la boîte noire</h2>
+  <p class="byline"><span class="badge todo">à faire</span></p>
+
+  <p><strong>Objectif</strong> — établir que le modèle fonde sa décision sur la texture du parenchyme,
+  et non sur un artefact corrélé. C'est la condition d'acceptabilité clinique du système.</p>
+
+  <div class="mermaid-box">
+  <pre class="mermaid">
+flowchart LR
+  M["Modèle entraîné<br>ResNet / ViT"] --> S["SHAP<br>attributions par pixel"]
+  M --> L["LIME<br>superpixels"]
+  S --> C["Concordance<br>SHAP ∩ LIME"]
+  L --> C
+  S --> O["Recouvrement<br>avec la ROI glandulaire"]
+  L --> O
+  C --> V{"Explications<br>cohérentes et<br>dans la glande ?"}
+  O --> V
+  V -->|oui| OK["Focus anatomique validé"]
+  V -->|non| KO["Retour Étape 1<br>masquage à renforcer"]
+  style OK fill:#14532d,stroke:#4ade80,color:#dbe2f0
+  style KO fill:#4a1d1d,stroke:#f87171,color:#dbe2f0
+  </pre>
+  <div class="fig-cap">Fig. 5 — L'XAI comme boucle de contrôle sur le prétraitement, pas seulement comme illustration finale.</div>
+  </div>
+
+  <h3>7.1 Deux méthodes, deux angles</h3>
+  <table>
+    <tr><th>Méthode</th><th>Principe</th><th>Force</th><th>Limite</th></tr>
+    <tr><td><strong>SHAP</strong><br><code>DeepExplainer</code> / <code>GradientExplainer</code></td><td>Attribution par pixel fondée sur les valeurs de Shapley, via les gradients internes</td><td>Granularité fine, fondement théorique</td><td>Coûteux, sensible au choix des données de référence</td></tr>
+    <tr><td><strong>LIME</strong><br><code>lime_image</code></td><td>Modèle linéaire local appris sur des perturbations de superpixels</td><td>Lisible, agnostique au modèle</td><td>Dépend fortement de la segmentation en superpixels</td></tr>
+  </table>
+
+  <div class="explain">
+    <div class="ct">🎓 Pourquoi deux méthodes plutôt qu'une</div>
+    <p>SHAP et LIME reposent sur des principes différents : le premier décompose la prédiction en
+    contributions théoriquement fondées, le second approche localement le modèle par une régression
+    lisible. Une explication produite par une seule méthode peut être un <em>artefact de la méthode</em>
+    plutôt qu'une propriété du modèle.</p>
+    <p>Quand deux approches indépendantes désignent la <em>même</em> région, l'explication devient
+    nettement plus défendable devant un clinicien — et devant un jury. C'est la logique de la
+    triangulation en méthodologie expérimentale.</p>
+  </div>
+
+  <h3>7.2 Mesure du focus anatomique</h3>
+  <p>Plutôt que de juger les heatmaps à l'œil, on quantifie la fraction de la saillance qui tombe
+  dans le masque glandulaire :</p>
+  <div class="eq-box">
+  $$\rho = \frac{\sum_{p \in \text{ROI}} |a_p|}{\sum_{p} |a_p|}$$
+  </div>
+  <p>avec $a_p$ l'attribution du pixel $p$. Un $\rho$ élevé signifie que le modèle regarde bien la
+  glande. Cette mesure est comparable entre modèles et entre conditions de prétraitement, ce qui en
+  fait un critère d'évaluation à part entière — et non une simple illustration.</p>
+
+  <h3>7.3 Livrables de l'étape</h3>
+  <table>
+    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
+    <tr><td>Heatmaps SHAP superposées</td><td><code>xai/shap_maps.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Superpixels LIME</td><td><code>xai/lime_maps.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Métrique de recouvrement ρ et concordance</td><td><code>xai/overlap.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Export haute résolution pour le manuscrit</td><td><code>xai/export.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 8. ÉTAPE 4 ══════════════════ -->
+<section id="etape4">
+  <h2>8 · Étape 4 — Alignement vision-langage avec CLIP</h2>
+  <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">cœur de la thèse</span></p>
+
+  <p><strong>Objectif</strong> — sortir de la classification pure et faire dialoguer l'image avec du
+  texte clinique, première brique d'une architecture RAG.</p>
+
+  <h3>8.1 Principe</h3>
+  <p>CLIP projette images et phrases dans un <strong>espace commun</strong>. Classer une image revient
+  alors à chercher la description clinique dont l'<em>embedding</em> lui est le plus proche :</p>
+  <div class="eq-box">
+  $$\operatorname{sim}(z_I, z_T) = \frac{z_I \cdot z_T}{\lVert z_I \rVert \, \lVert z_T \rVert}
+  \qquad
+  \hat{k} = \arg\max_k \operatorname{sim}(z_I, z_{T_k})$$
+  </div>
+
+  <h3>8.2 Le lexique clinique</h3>
+  <p>Les « ancres » du système sont littéralement des phrases, une par grade. Leur formulation est un
+  objet d'étude à part entière : elle encode le savoir clinique sous une forme que le modèle comprend.</p>
+  <pre><code><span class="cm"># esquisse du lexique — formulations à affiner et à faire valider cliniquement</span>
+PROMPTS = {
+    <span class="nb">0</span>: <span class="st">"échographie d'une glande salivaire saine, parenchyme homogène"</span>,
+    <span class="nb">1</span>: <span class="st">"échographie d'une glande salivaire, hétérogénéité légère du parenchyme"</span>,
+    <span class="nb">2</span>: <span class="st">"échographie d'une glande salivaire, hétérogénéité modérée avec zones hypoéchogènes"</span>,
+    <span class="nb">3</span>: <span class="st">"échographie d'une glande salivaire, hétérogénéité sévère avec zones anéchoïques diffuses"</span>,
+}</code></pre>
+
+  <div class="callout warn">
+    <div class="ct">⚠ Un modèle entraîné sur des images naturelles</div>
+    CLIP n'a pas vu d'échographies pendant son pré-entraînement. Un résultat zero-shot faible serait
+    donc un <strong>constat attendu et informatif</strong>, non un échec : il justifierait le recours à
+    une variante biomédicale ou à un ajustement léger. Ce point est consigné <em>avant</em> la mesure,
+    pour ne pas réinterpréter le résultat après coup.
+  </div>
+
+  <h3>8.3 Livrables de l'étape</h3>
+  <table>
+    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
+    <tr><td>Lexique clinique par grade</td><td><code>multimodal/prompts.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Extraction d'embeddings et similarité</td><td><code>multimodal/clip_infer.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Évaluation zero-shot sur les 4 grades</td><td><code>multimodal/eval_zeroshot.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Recherche de cas similaires (image-to-image)</td><td><code>multimodal/retrieval.py</code></td><td><span class="badge todo">horizon</span></td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 9. PROTOCOLE ══════════════════ -->
+<section id="protocole">
+  <h2>9 · Protocole d'évaluation</h2>
+
+  <p>Sur 225 images, un score unique issu d'un découpage unique n'a <strong>aucune valeur
+  statistique</strong>. Le protocole ci-dessous est fixé avant les premières mesures.</p>
+
+  <h3>9.1 Schémas de validation</h3>
+  <table>
+    <tr><th>Schéma</th><th>Ce qu'il mesure</th><th>Contrainte respectée</th></tr>
+    <tr><td><strong>k-fold stratifié groupé</strong></td><td>Performance moyenne et sa variabilité</td><td>Groupement par patient · stratification par grade</td></tr>
+    <tr><td><strong>Leave-one-center-out</strong></td><td>Généralisation à un appareil jamais vu</td><td>Teste directement la confusion centre/appareil</td></tr>
+    <tr><td><strong>Bootstrap sur le test</strong></td><td>Intervalles de confiance de chaque métrique</td><td>Rééchantillonnage au niveau patient</td></tr>
+  </table>
+
+  <h3>9.2 Métriques rapportées</h3>
+  <table>
+    <tr><th>Métrique</th><th>Pourquoi</th></tr>
+    <tr><td><strong>F1 macro</strong></td><td>Métrique de sélection — traite les quatre grades à parité malgré le déséquilibre</td></tr>
+    <tr><td><strong>Sensibilité par grade</strong></td><td>Manquer une atteinte débutante (grade 1) est l'erreur cliniquement la plus coûteuse</td></tr>
+    <tr><td><strong>Spécificité</strong></td><td>Limiter les faux positifs, qui déclencheraient des explorations inutiles</td></tr>
+    <tr><td><strong>Matrice de confusion</strong></td><td>Distingue les confusions entre grades voisins (tolérables) des confusions extrêmes (graves)</td></tr>
+    <tr><td><strong>AUC</strong></td><td>Comparabilité avec la littérature, en one-vs-rest pour le multiclasse</td></tr>
+    <tr><td><strong>Recouvrement ρ</strong></td><td>Métrique d'explicabilité — le modèle regarde-t-il la glande ?</td></tr>
+    <tr><td><strong>Accuracy</strong></td><td>Rapportée pour référence uniquement — <em>jamais</em> utilisée pour sélectionner un modèle</td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="ct">📌 Référence de base à battre</div>
+    Tout modèle doit être comparé au classifieur trivial qui prédit systématiquement le grade
+    majoritaire : <strong>48,9 % d'accuracy</strong>, mais un <strong>F1 macro de 0,164</strong>.
+    Cet écart entre les deux chiffres est l'illustration la plus directe de pourquoi l'accuracy est
+    trompeuse sur ce corpus.
+  </div>
+</section>
+
+<!-- ══════════════════ 10. INTÉGRITÉ ══════════════════ -->
+<section id="integrite">
+  <h2>10 · Intégrité scientifique</h2>
+
+  <p>Les règles ci-dessous sont posées à l'ouverture du projet, avant toute mesure, pour que les
+  résultats restent interprétables et défendables.</p>
+
+  <table>
+    <tr><th>Règle</th><th>Raison</th></tr>
+    <tr><td>Le découpage est <strong>groupé par patient</strong>, sans exception</td><td>Seul rempart contre la fuite de données, qui invaliderait l'ensemble des résultats</td></tr>
+    <tr><td>Le jeu de test n'est consulté qu'<strong>une seule fois</strong>, en fin d'étape</td><td>Chaque décision prise en regardant le test le transforme en jeu de validation déguisé</td></tr>
+    <tr><td>Tout chiffre affiché ici provient d'un <strong>run tracé</strong></td><td>Aucune valeur recopiée de mémoire ou estimée</td></tr>
+    <tr><td>Les hypothèses sont écrites <strong>avant</strong> la mesure</td><td>Empêche la réinterprétation a posteriori d'un résultat décevant</td></tr>
+    <tr><td>Un résultat négatif est <strong>consigné, pas effacé</strong></td><td>Un zero-shot CLIP faible est une information, pas un échec à masquer</td></tr>
+    <tr><td>Les graines aléatoires sont <strong>fixées et reportées</strong></td><td>Reproductibilité sur un corpus où la variance entre découpages est forte</td></tr>
+  </table>
+
+  <div class="callout danger">
+    <div class="ct">🚫 Ce document ne contient aucun résultat expérimental</div>
+    À ce stade, <strong>aucun modèle n'a été entraîné</strong>. Les seuls chiffres présentés sont des
+    <em>statistiques descriptives du jeu de données</em>, mesurées sur le CSV, et des valeurs calculées
+    analytiquement (poids de classes, performance du classifieur trivial). Toute cellule de performance
+    reste vide jusqu'à la production d'un run tracé.
+  </div>
+</section>
+
+<!-- ══════════════════ 11. STATUT ══════════════════ -->
+<section id="statut">
+  <h2>11 · Statut d'implémentation &amp; feuille de route</h2>
+
+  <div class="cards">
+    <div class="card"><div class="t">✅ Fait</div>
+      <div class="d">Cadrage scientifique et plan de travail (<code>Plan.md</code>) ·
+      acquisition et inspection du corpus HarmonicSS · caractérisation statistique des 225 images ·
+      identification des trois contraintes structurelles · protocole d'évaluation fixé ·
+      ce document de suivi.</div></div>
+    <div class="card"><div class="t">🚧 Étape courante</div>
+      <div class="d"><strong>Étape 1</strong> — reconstitution de l'identité patient, découpage groupé,
+      masquage de la ROI, extraction GLCM/LBP/coins, <code>SjogrenDataset</code>.</div></div>
+    <div class="card"><div class="t">🔭 Horizon</div>
+      <div class="d">Étapes 2 à 4 · variante ordinale de la perte · variante biomédicale de CLIP ·
+      recherche de cas similaires et architecture RAG.</div></div>
+  </div>
+
+  <div class="mermaid-box">
+  <pre class="mermaid">
+flowchart LR
+  A["<b>Fait</b><br>Cadrage · corpus<br>contraintes · protocole"] -->
+  B["<b>Étape 1</b><br>Split groupé patient<br>masquage ROI<br>GLCM · LBP · coins"] -->
+  C["<b>Étape 2</b><br>CNN · ResNet · ViT<br>multiclasse 0-3<br>k-fold + bootstrap"] -->
+  D["<b>Étape 3</b><br>SHAP + LIME<br>recouvrement ρ"] -->
+  E["<b>Étape 4</b><br>CLIP zero-shot<br>lexique clinique"] -->
+  F["<b>Horizon</b><br>RAG · cas similaires"]
+  style A fill:#14532d,stroke:#4ade80,color:#dbe2f0
+  style B fill:#1e2a4a,stroke:#818cf8,stroke-width:2px,color:#dbe2f0
+  style F stroke-dasharray: 5 5
+  </pre>
+  <div class="fig-cap">Fig. 6 — Trajectoire du projet. L'étape en cours est encadrée.</div>
+  </div>
+
+  <h3>Tableau de bord des résultats</h3>
+  <p>Ce tableau se remplit au fil des runs. <span class="badge todo">aucune mesure disponible</span></p>
+  <table>
+    <tr><th>Modèle</th><th>Tâche</th><th>F1 macro</th><th>Sensibilité grade 1</th><th>ρ (focus ROI)</th><th>Run</th></tr>
+    <tr><td>CNN scratch</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>ResNet18</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>ResNet50</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>ViT</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>CLIP zero-shot</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td><em>Classifieur trivial</em></td><td>multiclasse 0-3</td><td>0.164</td><td>0.000</td><td>—</td><td>analytique</td></tr>
+  </table>
+
+  <h3>Hiérarchie des sources du projet</h3>
+  <table>
+    <tr><th>Document</th><th>Statut</th></tr>
+    <tr><td><code>Plan.md</code></td><td><span class="badge core">autoritatif</span> plan de travail et contributions visées</td></tr>
+    <tr><td><code>HarmonicSS benchmark dataset/Anonymized images - Info.csv</code></td><td><span class="badge ok">seule source</span> des annotations et métadonnées</td></tr>
+    <tr><td><code>outputs/&lt;run_id&gt;/metrics.json</code></td><td><span class="badge ok">seule source</span> d'une valeur de performance</td></tr>
+    <tr><td><code>.claude/agents/sjogren-dl-engineer.md</code></td><td><span class="badge core">autoritatif</span> contexte de développement</td></tr>
+    <tr><td><code>research_works.html</code> (ce document)</td><td><span class="badge wip">vivant</span> méthodologie et suivi des étapes</td></tr>
+    <tr><td><a href="results.html"><code>results.html</code></a></td><td><span class="badge wip">vivant</span> tous les résultats chiffrés, étape par étape</td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 12. JOURNAL ══════════════════ -->
+<section id="journal">
+  <h2>12 · Journal des travaux</h2>
+
+  <p>Trace chronologique des décisions et des étapes franchies. Une ligne par événement marquant.</p>
+
+  <table>
+    <tr><th>Date</th><th>Événement</th><th>Détail</th></tr>
+    <tr>
+      <td><code>2026-09-19</code></td>
+      <td>Ouverture du suivi</td>
+      <td>Création de ce document. Plan de travail arrêté en 4 étapes, protocole d'évaluation fixé
+      avant toute mesure.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-19</code></td>
+      <td>Caractérisation du corpus</td>
+      <td>225 images inspectées. Distribution des grades De Vita établie (110 / 28 / 55 / 32).
+      Trois contraintes structurelles identifiées : fuite patient, confusion centre/appareil,
+      déséquilibre de classes.</td>
+    </tr>
+  </table>
+
+  <footer>
+    Document de suivi du projet SGUS-DL — gradation du syndrome de Gougerot-Sjögren sur échographie
+    des glandes salivaires · Auteur : Houssem Eddine Lassoued · Encadrement : Dr. Anis Ben Aicha et
+    Pr. Habib Fathallah · Les statistiques du corpus sont mesurées sur le CSV du jeu de données ;
+    aucun résultat de modèle n'est encore disponible à ce stade.
+  </footer>
+</section>
+
+</main>
+</div>
+
+<!-- ══════════════════ SCRIPTS ══════════════════ -->
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+const nodes = [...document.querySelectorAll('.mermaid')];
+const decode = html => { const t = document.createElement('textarea'); t.innerHTML = html; return t.value; };
+const sources = nodes.map(el => decode(el.innerHTML));
+
+const THEMES = {
+  dark: { theme: 'dark', vars: {
+    background: '#161b28', primaryColor: '#1c2333', primaryTextColor: '#dbe2f0',
+    primaryBorderColor: '#2a3348', lineColor: '#5eead4', secondaryColor: '#1e2a4a',
+    tertiaryColor: '#11151f', fontSize: '14px',
+  }},
+  light: { theme: 'base', vars: {
+    background: '#ffffff', primaryColor: '#eef1f6', primaryTextColor: '#1e2534',
+    primaryBorderColor: '#c3ccdc', lineColor: '#0d9488', secondaryColor: '#e7ecf4',
+    tertiaryColor: '#f5f7fb', fontSize: '14px',
+  }},
+};
+
+async function renderMermaid(mode) {
+  const t = THEMES[mode] || THEMES.dark;
+  mermaid.initialize({
+    startOnLoad: false, theme: t.theme, securityLevel: 'loose',
+    themeVariables: t.vars, flowchart: { curve: 'basis', htmlLabels: true },
+  });
+  nodes.forEach((el, i) => { el.removeAttribute('data-processed'); el.textContent = sources[i]; });
+  await mermaid.run({ nodes });
+}
+window.__renderMermaid = renderMermaid;
+renderMermaid(document.documentElement.classList.contains('light') ? 'light' : 'dark');
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* KaTeX auto-render */
+  const renderMath = () => {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.querySelector('main'), {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+        ],
+        ignoredTags: ['script','noscript','style','textarea','pre','code'],
+      });
+    } else setTimeout(renderMath, 200);
+  };
+  renderMath();
+
+  /* ── bascule de thème ── */
+  const themeBtn = document.getElementById('theme-toggle');
+  const updateThemeButton = () => {
+    const light = document.documentElement.classList.contains('light');
+    themeBtn.textContent = light ? '☾' : '☀';
+    themeBtn.setAttribute('aria-label', light ? 'Activer le thème sombre' : 'Activer le thème clair');
+    themeBtn.title = themeBtn.getAttribute('aria-label');
+  };
+  themeBtn.addEventListener('click', () => {
+    const light = document.documentElement.classList.toggle('light');
+    localStorage.setItem('sgus-theme', light ? 'light' : 'dark');
+    updateThemeButton();
+    if (window.__renderMermaid) window.__renderMermaid(light ? 'light' : 'dark');
+    drawDist();
+  });
+  updateThemeButton();
+
+  /* ── sidebar active state ── */
+  const links = document.querySelectorAll('nav.sidebar a');
+  const sections = [...links].map(a => document.querySelector(a.getAttribute('href')));
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active',
+          l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, {rootMargin: '-30% 0px -60% 0px'});
+  sections.forEach(s => s && obs.observe(s));
+
+  const $ = id => document.getElementById(id);
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  /* ══════════ Distributions réelles du corpus ══════════ */
+  // Effectifs mesurés sur "Anonymized images - Info.csv" (225 lignes).
+  const DIST = {
+    grade:    {labels:['Grade 0','Grade 1','Grade 2','Grade 3'], values:[110,28,55,32],
+               cap:'Fig. 1 — Distribution des grades De Vita sur les 225 images.'},
+    centre:   {labels:['Udine','Belgrade','Ljubljana','Milan'],  values:[75,53,50,47],
+               cap:'Fig. 1 — Répartition par centre clinique.'},
+    appareil: {labels:['Samsung','GE','Philips','Esaote'],        values:[75,53,50,47],
+               cap:'Fig. 1 — Répartition par constructeur d’échographe — identique à la répartition par centre, chaque site n’utilisant qu’un seul appareil.'},
+    glande:   {labels:['Parotide','Sous-mandibulaire'],           values:[115,110],
+               cap:'Fig. 1 — Répartition par type de glande.'},
+  };
+  let currentDist = 'grade';
+
+  function drawDist() {
+    const canvas = $('distCanvas');
+    if (!canvas) return;
+    const d = DIST[currentDist];
+    const ctx = canvas.getContext('2d');
+    // buffer 2× la taille affichée sur les deux axes (rendu net, sans déformation)
+    canvas.style.height = '260px';
+    const W = canvas.width = canvas.clientWidth * 2;
+    const H = canvas.height = 520;
+    ctx.clearRect(0, 0, W, H);
+
+    // padTop laisse la place aux deux étiquettes (effectif + pourcentage) au-dessus de la barre la plus haute
+    const pad = 70, padTop = 95, padBottom = 70;
+    const n = d.values.length;
+    const max = Math.max(...d.values);
+    const slot = (W - pad * 2) / n;
+    const bw = Math.min(slot * 0.55, 160);
+    const accent = css('--accent') || '#5eead4';
+    const accent2 = css('--accent2') || '#818cf8';
+    const muted = css('--muted') || '#8b96ad';
+    const strong = css('--strong') || '#fff';
+
+    // ligne de base
+    ctx.strokeStyle = css('--border') || '#2a3348';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(pad, H - padBottom); ctx.lineTo(W - pad, H - padBottom); ctx.stroke();
+
+    d.values.forEach((v, i) => {
+      const h = (v / max) * (H - padTop - padBottom);
+      const x = pad + slot * i + (slot - bw) / 2;
+      const y = H - padBottom - h;
+
+      const g = ctx.createLinearGradient(0, y, 0, H - padBottom);
+      g.addColorStop(0, accent);
+      g.addColorStop(1, accent2);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x, y, bw, h, [10, 10, 0, 0]);
+      else ctx.rect(x, y, bw, h);
+      ctx.fill();
+
+      // valeur
+      ctx.fillStyle = strong;
+      ctx.font = '700 30px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(v, x + bw / 2, y - 14);
+
+      // pourcentage
+      ctx.fillStyle = muted;
+      ctx.font = '22px system-ui';
+      ctx.fillText((v / 225 * 100).toFixed(1) + ' %', x + bw / 2, y - 44);
+
+      // étiquette
+      ctx.fillStyle = muted;
+      ctx.font = '24px system-ui';
+      ctx.fillText(d.labels[i], x + bw / 2, H - padBottom + 38);
+    });
+    $('dist-cap').textContent = d.cap;
+  }
+
+  document.querySelectorAll('#dist-seg .seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dist-seg .seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentDist = btn.dataset.dist;
+      drawDist();
+    });
+  });
+  drawDist();
+  window.addEventListener('resize', drawDist);
+
+  /* ══════════ Laboratoire — pondération des classes ══════════ */
+  const COUNTS = [110, 28, 55, 32];          // effectifs réels par grade
+  const GRADE_LABELS = ['Grade 0', 'Grade 1', 'Grade 2', 'Grade 3'];
+  const N = COUNTS.reduce((a, b) => a + b, 0);
+  const K = COUNTS.length;
+  let strategy = 'inv';
+
+  function weights(strat, beta) {
+    if (strat === 'none') return COUNTS.map(() => 1);
+    if (strat === 'inv')  return COUNTS.map(n => N / (K * n));
+    // nombre effectif (Cui et al. 2019), normalisé pour une moyenne de 1
+    const raw = COUNTS.map(n => (1 - beta) / (1 - Math.pow(beta, n)));
+    const mean = raw.reduce((a, b) => a + b, 0) / K;
+    return raw.map(w => w / mean);
+  }
+
+  function updateWeights() {
+    const beta = +$('beta').value;
+    $('o-beta').textContent = beta.toFixed(4);
+    const w = weights(strategy, beta);
+    const wmax = Math.max(...w);
+    $('gRatio').textContent = (wmax / Math.min(...w)).toFixed(2) + '×';
+
+    $('weightBars').innerHTML = w.map((wk, i) => {
+      const pct = (wk / wmax * 100).toFixed(1);
+      return '<div class="bar-row">'
+        + '<span>' + GRADE_LABELS[i] + ' <span style="color:var(--muted)">(' + COUNTS[i] + ' img)</span></span>'
+        + '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%"></span></span>'
+        + '<span class="bar-val">' + wk.toFixed(3) + '</span>'
+        + '</div>';
+    }).join('');
+  }
+
+  document.querySelectorAll('#strat-seg .seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#strat-seg .seg-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      strategy = btn.dataset.strat;
+      updateWeights();
+    });
+  });
+  $('beta').addEventListener('input', updateWeights);
+  updateWeights();
+});
+</script>
+</body>
+</html>
