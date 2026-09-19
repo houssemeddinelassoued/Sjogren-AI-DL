@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGUS-DL — Veille datasets · Autres corpus Sjögren disponibles</title>
+
+<style>
+:root{
+  --bg:#0b0e14; --bg2:#11151f; --panel:#161b28; --panel2:#1c2333;
+  --border:#2a3348; --text:#dbe2f0; --muted:#8b96ad;
+  --accent:#5eead4; --accent2:#818cf8; --warn:#fbbf24; --danger:#f87171;
+  --ok:#4ade80; --code:#0d1117; --strong:#fff; --group:#59627a;
+  --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Cascadia Code", Consolas, monospace;
+}
+:root.light{
+  --bg:#f5f7fb; --bg2:#eef1f6; --panel:#ffffff; --panel2:#e7ecf4;
+  --border:#d3dae6; --text:#1e2534; --muted:#5a6478;
+  --accent:#0d9488; --accent2:#4f46e5; --warn:#b45309; --danger:#dc2626;
+  --ok:#15803d; --strong:#0a0f1a; --group:#8b96ad;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.65}
+
+main{padding:2.2rem 3rem 6rem; max-width:980px; margin:0 auto; min-width:0}
+section{margin-bottom:3.4rem; scroll-margin-top:1rem}
+h1{font-size:1.95rem; margin-bottom:.4rem}
+h2{font-size:1.4rem; color:var(--accent); margin-bottom:1rem; padding-bottom:.4rem; border-bottom:1px solid var(--border)}
+h3{font-size:1.05rem; color:var(--accent2); margin:1.6rem 0 .6rem}
+p{margin-bottom:.8rem}
+.lead{font-size:1.05rem; color:var(--muted)}
+.byline{color:var(--muted); font-size:.84rem; margin-bottom:1.4rem}
+strong{color:var(--strong)}
+em{color:var(--warn); font-style:normal}
+a{color:var(--accent2)}
+
+.theme-toggle{
+  position:fixed; top:1rem; right:1rem; z-index:5; width:2.25rem; height:2.25rem;
+  padding:0; border:1px solid var(--border); border-radius:50%; background:var(--panel);
+  color:var(--text); font-size:1rem; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.theme-toggle:hover{border-color:var(--accent); color:var(--accent)}
+
+.back{display:inline-block; margin-bottom:1.6rem; font-size:.86rem; color:var(--muted); text-decoration:none;
+  border:1px solid var(--border); border-radius:8px; padding:.4rem .8rem; transition:.15s}
+.back:hover{border-color:var(--accent); color:var(--accent)}
+
+.verdict{background:var(--panel); border:1px solid var(--accent); border-left:5px solid var(--accent);
+  border-radius:12px; padding:1.2rem 1.4rem; margin:1.4rem 0 2rem}
+.verdict .vt{font-weight:700; color:var(--accent); margin-bottom:.4rem; font-size:1.02rem}
+
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; margin:1.2rem 0}
+.card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.2rem}
+.card .k{font-size:1.5rem; font-weight:700; color:var(--accent)}
+.card .t{font-weight:600; margin-bottom:.35rem; color:var(--strong)}
+.card .d{font-size:.84rem; color:var(--muted)}
+
+.badge{display:inline-block; font-size:.7rem; padding:.15rem .55rem; border-radius:999px; border:1px solid var(--border); color:var(--muted)}
+.badge.ok{color:var(--ok); border-color:var(--ok)}
+.badge.no{color:var(--danger); border-color:var(--danger)}
+.badge.part{color:var(--warn); border-color:var(--warn)}
+
+.callout{background:var(--panel); border-left:4px solid var(--accent); border-radius:8px; padding:.9rem 1.1rem; margin:1rem 0; font-size:.92rem}
+.callout.warn{border-left-color:var(--warn)}
+.callout .ct{font-weight:700; margin-bottom:.25rem}
+
+.explain{background:var(--panel); border:1px solid var(--accent2); border-left:5px solid var(--accent2);
+  border-radius:10px; padding:1rem 1.2rem; margin:1.2rem 0; font-size:.93rem}
+.explain .ct{font-weight:700; color:var(--accent2); margin-bottom:.35rem}
+.explain p{margin-bottom:.55rem}
+.explain p:last-child{margin-bottom:0}
+
+.tw{overflow-x:auto}
+table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:.87rem}
+th,td{padding:.55rem .75rem; text-align:left; border-bottom:1px solid var(--border); vertical-align:top}
+th{color:var(--accent); font-weight:600; background:var(--panel)}
+tr:hover td{background:rgba(94,234,212,.03)}
+td code, p code, li code{background:var(--code); padding:.1rem .4rem; border-radius:5px; font-family:var(--mono); font-size:.83em; color:#9ecbff}
+:root.light td code, :root.light p code, :root.light li code{color:#0550ae}
+
+ol,ul{margin:.5rem 0 1rem 1.4rem}
+li{margin-bottom:.45rem}
+.src li{font-size:.85rem; color:var(--muted)}
+
+.tree{background:var(--code); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem;
+  margin:.8rem 0; overflow-x:auto; font-family:var(--mono); font-size:.8rem; line-height:1.7; color:#c9d1d9}
+:root.light .tree{color:#24292f}
+
+@media(max-width:760px){
+  main{padding:1.6rem 1rem 4rem}
+  h1{font-size:1.5rem}
+  h2{font-size:1.18rem}
+  .theme-toggle{top:.5rem; right:.5rem}
+}
+</style>
+<script>
+// Applique le thème sauvegardé avant le premier rendu (évite le flash)
+if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.classList.add('light');
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème clair" title="Activer le thème clair">☀</button>
+
+<div style="background:#0e1620;color:#5eead4;padding:.6rem 1.2rem;font-size:.85rem;text-align:center;font-family:sans-serif;border-bottom:1px solid #1f293d">
+  Travaux de recherche réalisés par <strong style="color:#fff">Houssem Eddine Lassoued</strong>, encadré par <strong style="color:#fff">Dr. Anis Ben Aicha</strong> et <strong style="color:#fff">Pr. Habib Fathallah</strong>
+  </br>
+  Annexe à la section 3 — recensement des corpus Sjögren mobilisables pour le projet.
+</div>
+
+<main>
+
+<a class="back" href="research_works.html#donnees">← Retour · 3 · Jeu de données</a>
+
+<section id="synthese">
+  <h1>Existe-t-il d'autres jeux de données Sjögren ?</h1>
+  <div class="byline">Veille documentaire — dernière vérification le 19 septembre 2026</div>
+
+  <p class="lead">Question posée : le corpus HarmonicSS peut-il être complété, voire remplacé, par
+  d'autres jeux de données publics pour la gradation du syndrome de Sjögren ?</p>
+
+  <div class="verdict">
+    <div class="vt">Conclusion</div>
+    <strong>Non. À ce jour, HarmonicSS est le seul corpus d'échographie de glandes salivaires
+    public et directement téléchargeable disposant d'annotations de grade.</strong>
+    Toutes les autres cohortes SGUS identifiées sont privées ou accessibles uniquement sur demande
+    auprès des auteurs. Cette rareté n'est pas un obstacle au projet : elle en renforce la portée.
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="k">1</div><div class="t">corpus SGUS public</div>
+      <div class="d">HarmonicSS — celui déjà utilisé par le projet, 225 images annotées De Vita 0-3.</div></div>
+    <div class="card"><div class="k">0</div><div class="t">entrée glande salivaire</div>
+      <div class="d">Sur les 96 datasets du répertoire open-access NIDUS/RadOSS dédié à l'échographie.</div></div>
+    <div class="card"><div class="k">4+</div><div class="t">cohortes privées</div>
+      <div class="d">Plus grandes (jusqu'à 1184 images) mais non redistribuées.</div></div>
+  </div>
+</section>
+
+<section id="preuves">
+  <h2>1 · Les trois vérifications convergentes</h2>
+
+  <p>La conclusion ne repose pas sur une recherche unique mais sur trois sources indépendantes qui
+  se recoupent.</p>
+
+  <h3>1.1 La revue de référence le dit explicitement</h3>
+  <p>La revue <em>Frontiers in Immunology</em> (2026) consacrée à l'IA multimodale pour la détection
+  précoce de la maladie de Sjögren constate qu'« aucun benchmark public complet n'est disponible »
+  pour les applications d'IA sur cette pathologie. Les auteurs recensent une quinzaine de cohortes —
+  échographie, histopathologie, métabolomique, CT/IRM — et notent que la quasi-totalité relève
+  d'« études rétrospectives, monocentriques et de petite taille, validées en interne ». Ils placent
+  la <strong>construction d'un benchmark public annoté</strong> parmi les priorités à court terme
+  de la discipline.</p>
+
+  <h3>1.2 Le répertoire open-access d'échographie ne contient rien</h3>
+  <p>Le répertoire NIDUS/RadOSS des datasets échographiques en accès libre référence
+  <strong>96 jeux de données</strong> classés par application clinique (sein, cardiaque, obstétrique,
+  thyroïde, prostate…). Aucune entrée ne concerne les glandes salivaires, la parotide ou la
+  sous-mandibulaire. L'entrée anatomiquement la plus proche est <code>Segthy</code>
+  (thyroïde / cou, IRM + échographie), qui ne porte pas sur le parenchyme salivaire.</p>
+
+  <h3>1.3 Les publications récentes travaillent sur données fermées</h3>
+  <p>Les études SGUS publiées entre 2024 et 2026 s'appuient sans exception sur des cohortes
+  institutionnelles, assorties au mieux de la mention <em>« data available upon reasonable
+  request »</em>. Aucune n'a donné lieu à un dépôt public de type Zenodo, Figshare ou Kaggle.</p>
+</section>
+
+<section id="privees">
+  <h2>2 · Les cohortes qui existent mais ne sont pas publiques</h2>
+
+  <p>Elles sont recensées ici parce qu'elles constituent l'état de l'art auquel les résultats du
+  projet seront comparés, et parce qu'une demande d'accès reste envisageable pour une validation
+  externe.</p>
+
+  <div class="tw">
+  <table>
+    <thead>
+      <tr><th>Cohorte</th><th>Taille</th><th>Modalité</th><th>Accès</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Rheumatology 2024</strong><br><span style="color:var(--muted);font-size:.82rem">Cohorte chinoise multicentrique</span></td>
+        <td>1184 images<br>287 patients</td>
+        <td>SGUS — segmentation (U-Net, FCDenseNet) et évaluation de sévérité</td>
+        <td><span class="badge part">Sur demande</span></td>
+      </tr>
+      <tr>
+        <td><strong>Radiomics parotide 2026</strong></td>
+        <td>866 images<br>202 sujets<br><span style="color:var(--muted);font-size:.82rem">123 Sjögren, 33 témoins sains, 24 sicca non-Sjögren, 22 formes incomplètes</span></td>
+        <td>SGUS — radiomique + apprentissage automatique</td>
+        <td><span class="badge part">Sur demande</span></td>
+      </tr>
+      <tr>
+        <td><strong>SGUS radiomique (revue Frontiers)</strong></td>
+        <td>600 images<br>907 descripteurs extraits</td>
+        <td>SGUS — sélection de descripteurs par algorithme génétique</td>
+        <td><span class="badge no">Privé</span></td>
+      </tr>
+      <tr>
+        <td><strong>Biopsies glandes labiales — atteinte d'organe</strong></td>
+        <td>221 patients</td>
+        <td>Histopathologie — lames entières (WSI)</td>
+        <td><span class="badge no">Privé</span></td>
+      </tr>
+      <tr>
+        <td><strong>ImmunoHistoBench</strong></td>
+        <td>347 lames WSI<br>93 patients<br><span style="color:var(--muted);font-size:.82rem">46 sicca non-spécifique, 47 Sjögren</span></td>
+        <td>Histopathologie multi-marquage — H&amp;E + IHC (CD20, CD3, CD21, CD138), ~3,7 marquages par patient</td>
+        <td><span class="badge part">Code public, données à vérifier</span></td>
+      </tr>
+      <tr>
+        <td><strong>Biopsies — classification par CNN</strong></td>
+        <td>172 lames<br>2 par patient</td>
+        <td>Histopathologie — ResNet-152 sur plateforme AutoML</td>
+        <td><span class="badge no">Privé</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout warn">
+    <div class="ct">⚠ Ce que cette table ne dit pas</div>
+    Aucune de ces cohortes n'utilise le <strong>score De Vita 0-3</strong> comme cible principale :
+    elles travaillent en binaire (Sjögren / non-Sjögren), sur le score OMERACT, ou sur des tâches de
+    segmentation. La tâche multiclasse retenue par le projet reste donc sans équivalent direct
+    dans la littérature accessible.
+  </div>
+</section>
+
+<section id="publiques">
+  <h2>3 · Ce qui est réellement public, mais dans une autre modalité</h2>
+
+  <p>Ces ressources sont librement téléchargeables. Aucune ne porte sur l'échographie salivaire,
+  mais deux pourraient servir d'extension au projet.</p>
+
+  <h3>3.1 Transcriptomique — GEO</h3>
+  <p>Les séries <code>GSE40568</code> et <code>GSE40611</code> du Gene Expression Omnibus contiennent
+  des données d'expression génique Sjögren, exploitées dans la littérature pour l'analyse de réseaux
+  de régulation (WGCNA, 376 gènes différentiellement exprimés). Librement téléchargeables.</p>
+  <p><strong>Pertinence pour le projet :</strong> faible à court terme. L'Étape 4 vise un alignement
+  <em>vision-langage</em> (image ↔ description clinique textuelle via CLIP), pas une fusion
+  image ↔ omique. Ces données ne deviendraient utiles que si le périmètre multimodal était élargi.</p>
+
+  <h3>3.2 Échographie générique — Zenodo</h3>
+  <p>Le dépôt Zenodo <code>record 8367932</code> propose un large corpus échographique multicentrique
+  et multi-tâches portant sur d'autres organes.</p>
+  <p><strong>Pertinence pour le projet :</strong> envisageable comme <em>pré-entraînement
+  domaine-adjacent</em>. Un réseau exposé en amont à la texture ultrasonore générique — speckle,
+  gradients d'atténuation, artefacts de sonde — peut converger plus vite sur 225 images que depuis
+  des poids ImageNet. À considérer seulement si le transfert ImageNet plafonne.</p>
+</section>
+
+<section id="exploitable">
+  <h2>4 · Trouvaille directement exploitable pour l'Étape 1</h2>
+
+  <div class="explain">
+    <div class="ct">🎯 Des modèles de segmentation pré-entraînés sur exactement ces données</div>
+    <p>Le dépôt GitHub d'<strong>Arso Vukicevic</strong>, auteur du benchmark HarmonicSS, publie des
+    modèles de segmentation de glande salivaire entraînés sur ce même corpus. Cela répond directement
+    au besoin d'<strong>isolement de la région d'intérêt</strong> formulé à l'Étape 1 : plutôt que de
+    coder une détection heuristique des incrustations et des bords de sonde, le parenchyme peut être
+    masqué à partir de ces prédictions.</p>
+  </div>
+
+  <div class="tree">Assessment-of-pSS-from-SGUS-images/
+├── 1 MLP Classifier/
+│   ├── Matlab code for features extraction from SGUS images/   ← descripteurs radiomiques publiés
+│   └── Weka inputs and MLP model/
+├── 2 Deep Learning - SG segmentation/
+│   ├── FCN-DenseNet inference/
+│   └── Inference all four (FCN, FCN-DenseNet, U-Net, LinkNet) models/
+│       ├── inference.py
+│       ├── utils.py
+│       └── inference_graph/frozen_graph.pb                      ← 38 Mo, poids pré-entraînés
+└── 3 HarmonicSS benchmark dataset/</div>
+
+  <ul>
+    <li><strong>Quatre architectures</strong> disponibles en inférence : FCN, FCN-DenseNet, U-Net et LinkNet.</li>
+    <li><strong>Format :</strong> graphe TensorFlow figé (<code>frozen_graph.pb</code>). Le projet étant
+    en PyTorch, l'usage passe par une dépendance TensorFlow ponctuelle ou une conversion ONNX —
+    l'inférence seule suffit, aucun réentraînement n'est requis.</li>
+    <li><strong>Bonus :</strong> le code Matlab d'extraction des descripteurs radiomiques du
+    classifieur MLP publié offre un point de comparaison pour les descripteurs GLCM et LBP de l'Étape 1.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="ct">🔍 Vérification préalable nécessaire</div>
+    La licence du dépôt et la correspondance exacte entre les images segmentées par ces modèles et
+    les 225 images du corpus local doivent être contrôlées avant toute intégration au pipeline.
+  </div>
+</section>
+
+<section id="implication">
+  <h2>5 · Ce que cela implique pour la thèse</h2>
+
+  <div class="explain">
+    <div class="ct">🎓 La rareté est un argument, pas une contrainte</div>
+    <p>L'absence de corpus public alternatif justifie directement les choix méthodologiques du projet
+    plutôt qu'elle ne les limite :</p>
+    <p><strong>Elle valide la rigueur du protocole.</strong> Avec 225 images et aucun jeu de validation
+    externe disponible, le découpage groupé par patient, la validation croisée et les intervalles de
+    confiance par bootstrap ne sont plus des précautions optionnelles : ce sont les seules garanties
+    de fiabilité des résultats.</p>
+    <p><strong>Elle renforce la contribution revendiquée.</strong> Aucune cohorte accessible ne traite
+    la gradation multiclasse De Vita 0-3. Le travail se positionne donc sur une tâche que la
+    littérature publique n'a pas couverte, sur le seul corpus qui permette de la reproduire.</p>
+    <p><strong>Elle motive les techniques petits-échantillons.</strong> Transfer learning, augmentation
+    agressive, pondération des classes et injection de descripteurs de texture explicites ne sont pas
+    des raffinements : ce sont les réponses directes à une contrainte que toute la discipline subit.</p>
+  </div>
+
+  <div class="callout warn">
+    <div class="ct">⚠ Limite à énoncer dans le mémoire</div>
+    L'impossibilité d'une validation externe sur cohorte indépendante doit être déclarée explicitement
+    comme limite de l'étude. La contre-mesure disponible est le test
+    <em>leave-one-center-out</em> décrit en section 3 du document principal : il simule un changement
+    de centre et d'appareil, et constitue le substitut le plus proche d'une validation externe.
+  </div>
+</section>
+
+<section id="sources">
+  <h2>6 · Sources</h2>
+  <ul class="src">
+    <li><a href="https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2026.1792331/full">Frontiers in Immunology 2026 — <em>From subjective assessment to data-driven diagnosis: the AI revolution in multimodal early detection of Sjögren's disease</em></a></li>
+    <li><a href="https://ultrasound-open-access.nidusai.ca/">NIDUS Lab / RadOSS — Ultrasound Open Access Datasets (répertoire de 96 datasets)</a></li>
+    <li><a href="https://doi.org/10.1093/rheumatology/keae312">Rheumatology 2024 — <em>Deep learning in the precise assessment of primary Sjögren's syndrome based on ultrasound images</em></a></li>
+    <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC13509949/">PMC — <em>Detecting Sjögren's disease from parotid gland ultrasound radiomics</em></a></li>
+    <li><a href="https://github.com/ArsoVukicevic/Assessment-of-pSS-from-SGUS-images">GitHub — ArsoVukicevic / Assessment-of-pSS-from-SGUS-images (modèles de segmentation pré-entraînés)</a></li>
+    <li><a href="https://github.com/AI4RadMic/SjogrenSyndromAI4RadMicDaniPablo">GitHub — AI4RadMic / SjogrenSyndromAI4RadMicDaniPablo (classification OMERACT)</a></li>
+    <li><a href="https://arxiv.org/abs/2410.21560">arXiv 2410.21560 — <em>Going Beyond H&amp;E and Oncology: How Do Histopathology Foundation Models Perform for Multi-stain IHC and Immunology?</em></a></li>
+    <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12234637/">PMC — <em>AI-based prediction of organ involvement in Sjögren's syndrome using labial gland biopsy whole-slide images</em></a></li>
+    <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11539618/">PMC — <em>Classification of salivary gland biopsies in Sjögren's syndrome by a CNN using an auto-machine learning platform</em></a></li>
+    <li><a href="https://zenodo.org/records/8367932">Zenodo record 8367932 — Fine-grained multi-centre multi-task ultrasound dataset</a></li>
+    <li><a href="https://doi.org/10.3389/fmed.2020.581248">Frontiers in Medicine 2020 — publication d'origine du benchmark HarmonicSS (corpus du projet)</a></li>
+  </ul>
+</section>
+
+<a class="back" href="research_works.html#donnees">← Retour · 3 · Jeu de données</a>
+
+</main>
+
+<script>
+const themeBtn = document.getElementById('theme-toggle');
+const updateThemeButton = () => {
+  const light = document.documentElement.classList.contains('light');
+  themeBtn.textContent = light ? '☾' : '☀';
+  themeBtn.setAttribute('aria-label', light ? 'Activer le thème sombre' : 'Activer le thème clair');
+  themeBtn.title = themeBtn.getAttribute('aria-label');
+};
+themeBtn.addEventListener('click', () => {
+  const light = document.documentElement.classList.toggle('light');
+  localStorage.setItem('sgus-theme', light ? 'light' : 'dark');
+  updateThemeButton();
+});
+updateThemeButton();
+</script>
+</body>
+</html>

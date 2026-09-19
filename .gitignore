@@ -17,6 +17,9 @@ runs/
 wandb/
 mlruns/
 
+# Claude Code transient state
+.claude/scheduled_tasks.lock
+
 # OS / editor
 .DS_Store
 Thumbs.db
