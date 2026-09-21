@@ -238,9 +238,9 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
   <p>Les séries <code>GSE40568</code> et <code>GSE40611</code> du Gene Expression Omnibus contiennent
   des données d'expression génique Sjögren, exploitées dans la littérature pour l'analyse de réseaux
   de régulation (WGCNA, 376 gènes différentiellement exprimés). Librement téléchargeables.</p>
-  <p><strong>Pertinence pour le projet :</strong> faible à court terme. L'Étape 4 vise un alignement
-  <em>vision-langage</em> (image ↔ description clinique textuelle via CLIP), pas une fusion
-  image ↔ omique. Ces données ne deviendraient utiles que si le périmètre multimodal était élargi.</p>
+  <p><strong>Pertinence pour le projet :</strong> nulle dans le périmètre actuel. La phase 1 porte
+  exclusivement sur l'image échographique. Une fusion image ↔ omique relèverait d'un élargissement
+  du périmètre qui n'est ni engagé ni envisagé à ce stade.</p>
 
   <h3>3.2 Échographie générique — Zenodo</h3>
   <p>Le dépôt Zenodo <code>record 8367932</code> propose un large corpus échographique multicentrique
@@ -252,15 +252,31 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 </section>
 
 <section id="exploitable">
-  <h2>4 · Trouvaille directement exploitable pour l'Étape 1</h2>
+  <h2>4 · Trouvaille exploitable — mais à un seul endroit du pipeline</h2>
 
   <div class="explain">
     <div class="ct">🎯 Des modèles de segmentation pré-entraînés sur exactement ces données</div>
     <p>Le dépôt GitHub d'<strong>Arso Vukicevic</strong>, auteur du benchmark HarmonicSS, publie des
-    modèles de segmentation de glande salivaire entraînés sur ce même corpus. Cela répond directement
-    au besoin d'<strong>isolement de la région d'intérêt</strong> formulé à l'Étape 1 : plutôt que de
-    coder une détection heuristique des incrustations et des bords de sonde, le parenchyme peut être
-    masqué à partir de ces prédictions.</p>
+    modèles de segmentation de glande salivaire entraînés sur ce même corpus. Ces masques répondent
+    à un besoin réel du projet — mais leur usage doit être soigneusement délimité, car ils encodent
+    la délinéation de la glande par des experts.</p>
+  </div>
+
+  <div class="tw">
+  <table>
+    <tr><th>Usage envisageable</th><th>Phase</th><th>Pourquoi</th></tr>
+    <tr><td><strong>Instrument de mesure</strong> — définir la région glandulaire servant à calculer le recouvrement ρ à l'étape 1.4</td><td><span class="badge ok">phase 1</span></td><td>Le masque ne touche jamais l'entrée du réseau. Il sert uniquement à <em>évaluer</em> où tombe la saillance des explications. Le modèle reste une boîte noire nourrie de l'image seule.</td></tr>
+    <tr><td><strong>Filtre d'entrée</strong> — restreindre l'image fournie au réseau au seul parenchyme</td><td><span class="badge no">phase 2</span></td><td>Fournir au modèle une région tracée par un expert, c'est injecter de l'expertise dans la chaîne. Hors périmètre de la phase 1.</td></tr>
+    <tr><td><strong>Nettoyage des artefacts</strong> — retirer bords de sonde et texte incrusté</td><td><span class="badge ok">phase 1</span></td><td>Relève de l'hygiène des données, mais ne nécessite pas ces modèles : une détection heuristique des incrustations suffit et reste indépendante de toute annotation experte.</td></tr>
+  </table>
+  </div>
+
+  <div class="callout">
+    <div class="ct">💡 Ce que cela débloque pour l'étape 1.4</div>
+    Le calcul du recouvrement ρ suppose une définition de la région glandulaire. Sans ces modèles, il
+    aurait fallu annoter manuellement un échantillon d'images. Ces masques pré-entraînés, produits sur
+    le corpus même du projet, fournissent cette référence sans travail d'annotation — à condition
+    d'être déclarés comme <strong>instrument de mesure</strong> et non comme composant du modèle.
   </div>
 
   <div class="tree">Assessment-of-pSS-from-SGUS-images/
@@ -280,8 +296,9 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
     <li><strong>Format :</strong> graphe TensorFlow figé (<code>frozen_graph.pb</code>). Le projet étant
     en PyTorch, l'usage passe par une dépendance TensorFlow ponctuelle ou une conversion ONNX —
     l'inférence seule suffit, aucun réentraînement n'est requis.</li>
-    <li><strong>Bonus :</strong> le code Matlab d'extraction des descripteurs radiomiques du
-    classifieur MLP publié offre un point de comparaison pour les descripteurs GLCM et LBP de l'Étape 1.</li>
+    <li><strong>À noter pour plus tard :</strong> le dépôt publie aussi le code Matlab d'extraction de
+    descripteurs radiomiques d'un classifieur MLP. Hors périmètre de la phase 1, mais à retenir si la
+    phase 2 s'oriente vers l'injection de caractéristiques calculées.</li>
   </ul>
 
   <div class="callout">
@@ -306,8 +323,8 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
     la gradation multiclasse De Vita 0-3. Le travail se positionne donc sur une tâche que la
     littérature publique n'a pas couverte, sur le seul corpus qui permette de la reproduire.</p>
     <p><strong>Elle motive les techniques petits-échantillons.</strong> Transfer learning, augmentation
-    agressive, pondération des classes et injection de descripteurs de texture explicites ne sont pas
-    des raffinements : ce sont les réponses directes à une contrainte que toute la discipline subit.</p>
+    agressive et pondération des classes ne sont pas des raffinements : ce sont les réponses directes
+    à une contrainte que toute la discipline subit.</p>
   </div>
 
   <div class="callout warn">

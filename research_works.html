@@ -135,15 +135,6 @@ canvas{width:100%; border-radius:10px; background:var(--bg)}
   border-radius:999px; cursor:pointer; font-size:.8rem; font-family:var(--font)}
 .seg-btn.active{color:var(--accent); border-color:var(--accent); background:var(--panel)}
 
-/* tabs */
-.tabs{display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:-1px}
-.tab-btn{background:var(--panel); border:1px solid var(--border); border-bottom:none; color:var(--muted);
-  padding:.45rem 1rem; border-radius:9px 9px 0 0; cursor:pointer; font-size:.82rem; font-family:var(--font)}
-.tab-btn.active{color:var(--accent); background:var(--code)}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-.tab-panel pre{margin-top:0; border-radius:0 10px 10px 10px}
-
 kbd{background:var(--panel2); border:1px solid var(--border); border-radius:5px; padding:.05rem .4rem; font-size:.78em; font-family:var(--mono)}
 .eq-box{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:.9rem 1.2rem; margin:.8rem 0; overflow-x:auto}
 footer{color:var(--muted); font-size:.78rem; border-top:1px solid var(--border); padding-top:1.2rem; margin-top:3rem}
@@ -184,22 +175,23 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 <div class="layout">
 <nav class="sidebar" id="sidebar">
   <div class="logo">SGUS-DL</div>
-  <div class="sub">Gradation du syndrome de Sjögren<br>Travaux de recherche</div>
+  <div class="sub">Gradation du syndrome de Sjögren<br>Phase 1 — boîte noire</div>
   <div class="group">Comprendre</div>
   <a href="#apercu">1 · Vue d'ensemble</a>
   <a href="#clinique">2 · Cadre clinique</a>
   <a href="#donnees">3 · Jeu de données</a>
-  <div class="group">Le pipeline</div>
-  <a href="#pipeline">4 · Vue du pipeline</a>
-  <a href="#etape1">5 · Étape 1 — Données &amp; features</a>
-  <a href="#etape2">6 · Étape 2 — Modélisation</a>
-  <a href="#etape3">7 · Étape 3 — Explicabilité</a>
-  <a href="#etape4">8 · Étape 4 — Multimodal CLIP</a>
-  <div class="group">La science</div>
-  <a href="#protocole">9 · Protocole d'évaluation</a>
+  <div class="group">Phase 1</div>
+  <a href="#phase1">4 · Vue de la phase 1</a>
+  <a href="#e11">5 · 1.1 Pipeline de données</a>
+  <a href="#e12">6 · 1.2 Modèles boîte noire</a>
+  <a href="#e13">7 · 1.3 Protocole d'évaluation</a>
+  <a href="#e14">8 · 1.4 Explication post-hoc</a>
+  <a href="#e15">9 · 1.5 Analyse &amp; limites</a>
+  <div class="group">Le cadre</div>
   <a href="#integrite">10 · Intégrité scientifique</a>
-  <a href="#statut">11 · Statut &amp; feuille de route</a>
-  <a href="#journal">12 · Journal des travaux</a>
+  <a href="#phase2">11 · Phase 2 — différée</a>
+  <a href="#statut">12 · Statut &amp; feuille de route</a>
+  <a href="#journal">13 · Journal des travaux</a>
 </nav>
 
 <main>
@@ -209,29 +201,45 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
   <h1>Gradation automatique du syndrome de Sjögren</h1>
 
   <p class="lead">Prédiction du <strong>stade d'atteinte des glandes salivaires</strong> (score de De Vita,
-  grades 0 à 3) à partir d'images d'échographie, par un pipeline hybride associant
-  <strong>descripteurs de texture classiques</strong>, <strong>réseaux profonds</strong>,
-  <strong>explicabilité multi-méthodes</strong> et <strong>alignement vision-langage</strong>.</p>
+  grades 0 à 3) à partir d'images d'échographie. Le projet avance en deux phases : d'abord une
+  <strong>approche boîte noire avec explication post-hoc</strong>, puis l'intégration de l'expertise
+  humaine dans la chaîne.</p>
 
   <div class="project-context">
-    Ce document est le <strong>journal de bord technique</strong> du projet : il décrit ce qui est prévu,
-    ce qui est fait, et ce que chaque choix méthodologique cherche à résoudre. Il est mis à jour à chaque
-    étape franchie. Le plan de travail de référence est <code>Plan.md</code>.
+    Ce document est le <strong>journal de bord technique</strong> du projet : il décrit ce qui est engagé,
+    ce qui est fait, et ce que chaque choix méthodologique cherche à résoudre. Il ne documente
+    <strong>que les travaux effectivement arrêtés</strong>. Plan de travail de référence : <code>Plan.md</code>.
+  </div>
+
+  <h3>Le découpage en deux phases</h3>
+  <table>
+    <tr><th>Phase</th><th>Objet</th><th>État</th></tr>
+    <tr><td><strong>Phase 1</strong></td><td>Approche <strong>boîte noire</strong> avec <strong>explication post-hoc</strong> — le modèle ne reçoit que l'image, et l'on cherche après coup ce sur quoi il s'appuie</td><td><span class="badge wip">en cours</span></td></tr>
+    <tr><td><strong>Phase 2</strong></td><td>Intégration de l'<strong>expertise humaine</strong> dans la chaîne</td><td><span class="badge todo">différée — périmètre à définir</span></td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="ct">🎯 Ce que « boîte noire » signifie ici, précisément</div>
+    En phase 1, le réseau reçoit <strong>uniquement l'image</strong> : aucun descripteur de texture calculé
+    à la main, aucune région tracée par un expert, aucun lexique clinique. Le seul prétraitement autorisé
+    est le <strong>nettoyage des artefacts d'acquisition</strong> — bords de sonde, texte incrusté par
+    l'appareil. Ce n'est pas de l'expertise injectée mais de l'hygiène de données : sans elle, les
+    explications post-hoc décriraient la réaction du modèle à des incrustations d'écran plutôt qu'à la glande.
   </div>
 
   <div class="cards">
     <div class="card"><div class="t">Le problème clinique</div>
       <div class="d">L'évaluation échographique des glandes salivaires est <strong>semi-quantitative et
       opérateur-dépendante</strong>. Graduer l'atteinte demande une expertise rare, et la reproductibilité
-      entre praticiens reste imparfaite — d'où l'intérêt d'une aide automatisée et reproductible.</div></div>
+      entre praticiens reste imparfaite.</div></div>
     <div class="card"><div class="t">La tâche visée</div>
       <div class="d">Non pas un simple « sain vs malade », mais la <strong>prédiction du grade 0-3</strong>.
       Un problème à quatre classes ordinales, fortement déséquilibré, sur un corpus de
       <strong>225 images seulement</strong>.</div></div>
-    <div class="card"><div class="t">Le parti pris</div>
-      <div class="d">Ne pas laisser le réseau tout apprendre seul : lui <strong>fournir explicitement</strong>
-      la texture (GLCM, LBP, points d'intérêt), lui <strong>retirer</strong> ce qui n'est pas la glande
-      (incrustations, bords de sonde), puis <strong>vérifier par l'XAI</strong> qu'il regarde au bon endroit.</div></div>
+    <div class="card"><div class="t">L'exigence de la phase</div>
+      <div class="d">L'objectif n'est pas un chiffre mais une <strong>analyse défendable</strong> : ce que
+      le modèle a appris, ce qu'il rate, ce à quoi il est sensible, et ce que les méthodes d'explication
+      peuvent — ou ne peuvent pas — établir.</div></div>
   </div>
 
   <div class="explain">
@@ -245,16 +253,6 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
     <em>graduelle</em> : un grade 1 et un grade 2 se ressemblent bien davantage qu'un grade 0 et un grade 3.
     C'est pourquoi la matrice de confusion par grade est, pour ce projet, plus informative qu'un score global.</p>
   </div>
-
-  <h3>Les cinq contributions visées</h3>
-  <table>
-    <tr><th>#</th><th>Contribution</th><th>Étape</th><th>Statut</th></tr>
-    <tr><td>1</td><td><strong>Pipeline hybride</strong> — injection de descripteurs de texture explicites (GLCM, LBP) et de points d'intérêt en complément de l'image brute</td><td>1</td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>2</td><td><strong>Classification multiclasse</strong> des 4 grades De Vita, et non une détection binaire</td><td>2</td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>3</td><td><strong>Isolement de la région d'intérêt</strong> — neutralisation des artefacts d'acquisition</td><td>1</td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>4</td><td><strong>Explicabilité multi-méthodes</strong> — SHAP et LIME confrontés pour valider le focus anatomique</td><td>3</td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>5</td><td><strong>Alignement vision-langage</strong> — CLIP, ouvrant la voie à une architecture RAG</td><td>4</td><td><span class="badge todo">à faire</span></td></tr>
-  </table>
 </section>
 
 <!-- ══════════════════ 2. CADRE CLINIQUE ══════════════════ -->
@@ -266,26 +264,28 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
   parenchyme se traduit à l'échographie par une <strong>signature essentiellement texturale</strong>.</p>
 
   <h3>2.1 Sémiologie échographique</h3>
+  <p>Ce tableau sert de <strong>grille de lecture pour l'étape 1.4</strong> : les régions que SHAP et LIME
+  désigneront devront être confrontées à ces signes.</p>
   <table>
-    <tr><th>Signe</th><th>Traduction visuelle</th><th>Conséquence pour le modèle</th></tr>
-    <tr><td>Hétérogénéité du parenchyme</td><td>Alternance désordonnée de zones claires et sombres</td><td>Cible directe des descripteurs GLCM (contraste, homogénéité, entropie)</td></tr>
-    <tr><td>Zones anéchoïques / hypoéchoïques</td><td>Plages sombres bien délimitées dans le tissu</td><td>Motifs locaux détectables par LBP et par les cartes d'activation convolutionnelles</td></tr>
-    <tr><td>Perte de définition des contours</td><td>Frontière glande / tissu environnant floue</td><td>Détection de coins et de points d'intérêt structurels</td></tr>
-    <tr><td>Hypertrophie ou atrophie glandulaire</td><td>Variation de taille globale</td><td>Information d'échelle — sensible au réglage de l'appareil, donc à manier avec prudence</td></tr>
+    <tr><th>Signe</th><th>Traduction visuelle</th><th>Ce qu'on attend de l'explication post-hoc</th></tr>
+    <tr><td>Hétérogénéité du parenchyme</td><td>Alternance désordonnée de zones claires et sombres</td><td>Saillance répartie dans le tissu glandulaire, pas sur un bord</td></tr>
+    <tr><td>Zones anéchoïques / hypoéchoïques</td><td>Plages sombres bien délimitées dans le tissu</td><td>Saillance concentrée sur ces plages pour les grades élevés</td></tr>
+    <tr><td>Perte de définition des contours</td><td>Frontière glande / tissu environnant floue</td><td>Saillance sur la zone de transition, à distinguer d'un artefact de bord d'image</td></tr>
+    <tr><td>Hypertrophie ou atrophie glandulaire</td><td>Variation de taille globale</td><td>Information d'échelle — sensible au réglage de l'appareil, donc à interpréter avec prudence</td></tr>
   </table>
 
   <h3>2.2 Le score de De Vita (0-3)</h3>
   <p>Score semi-quantitatif de référence, gradant l'atteinte parenchymateuse par paliers. C'est la
   <strong>variable cible</strong> du projet. Le jeu de données fournit également le score OMERACT,
-  qui pourra servir de cible secondaire ou de contrôle de cohérence.</p>
+  qui pourra servir de contrôle de cohérence.</p>
 
   <div class="callout warn">
     <div class="ct">⚠ Une cible ordinale traitée comme catégorielle</div>
     Les grades 0 &lt; 1 &lt; 2 &lt; 3 sont <strong>ordonnés</strong> : confondre un grade 3 avec un grade 0
     est une erreur bien plus grave que de le confondre avec un grade 2. Une <code>CrossEntropyLoss</code>
-    standard ignore cet ordre et pénalise identiquement les deux cas. Ce point est consigné comme
-    <strong>piste d'amélioration</strong> pour l'Étape 2 (régression ordinale, ou perte pondérée par la
-    distance entre grades), à évaluer une fois la baseline catégorielle établie.
+    standard ignore cet ordre et pénalise identiquement les deux cas. La phase 1 assume ce choix pour
+    rester une baseline lisible ; la conséquence sera <strong>mesurée</strong> par la matrice de confusion
+    et <strong>consignée</strong> à l'étape 1.5, sans correction en cours de route.
   </div>
 </section>
 
@@ -307,18 +307,6 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
       <div class="d">Udine, Belgrade, Ljubljana, Milan — chacun avec un constructeur d'échographe différent.</div></div>
   </div>
 
-  <div class="callout">
-    <div class="ct">📚 Pourquoi ce corpus et pas un autre ?</div>
-    Une veille documentaire confirme qu'<strong>HarmonicSS est le seul corpus d'échographie de glandes
-    salivaires public et directement téléchargeable</strong> disposant d'annotations de grade : les
-    96 datasets du répertoire open-access NIDUS/RadOSS n'en comptent aucun, et les cohortes SGUS
-    publiées entre 2024 et 2026 restent privées. Le détail du recensement — cohortes fermées,
-    ressources publiques d'autres modalités, et des modèles de segmentation pré-entraînés
-    réutilisables pour l'Étape 1 — figure en annexe :
-    <a href="datasets_disponibles.html" style="color:var(--accent2)">existe-t-il d'autres jeux de
-    données Sjögren ? →</a>
-  </div>
-
   <h3>3.1 Répartition réelle du corpus</h3>
   <p>Chiffres mesurés directement sur <code>Anonymized images - Info.csv</code>. Sélectionnez une
   variable pour en voir la distribution.</p>
@@ -336,7 +324,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 
   <h3>3.2 Trois contraintes structurelles imposées par ces données</h3>
   <p>Ces trois points ne sont pas des détails d'implémentation : ils conditionnent la validité de
-  l'ensemble des résultats et sont traités explicitement dès l'Étape 1.</p>
+  l'ensemble des résultats et sont traités explicitement dès l'étape 1.1.</p>
 
   <div class="callout danger">
     <div class="ct">🩸 Contrainte 1 — Fuite de données entre patients</div>
@@ -354,7 +342,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
     Ljubljana-Philips (50), Milan-Esaote (47). La signature visuelle du constructeur — gamme de gris,
     incrustations, format d'image — est donc <strong>parfaitement corrélée au centre</strong>.
     Le modèle peut apprendre à reconnaître l'appareil au lieu de la maladie. Contre-mesures :
-    normalisation d'intensité, masquage des incrustations, et test de robustesse
+    normalisation d'intensité, nettoyage des incrustations, et test de robustesse
     <em>leave-one-center-out</em>.
   </div>
 
@@ -419,56 +407,60 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
   </div>
 </section>
 
-<!-- ══════════════════ 4. PIPELINE ══════════════════ -->
-<section id="pipeline">
-  <h2>4 · Vue du pipeline — les quatre étapes</h2>
+<!-- ══════════════════ 4. PHASE 1 ══════════════════ -->
+<section id="phase1">
+  <h2>4 · Vue de la phase 1 — boîte noire et explication post-hoc</h2>
+
+  <p>Cinq étapes enchaînées. L'étape 1.5 — analyse, interprétation et limites — est un
+  <strong>livrable à part entière</strong>, au même titre que le code : c'est elle qui détermine
+  le périmètre de la phase 2.</p>
 
   <div class="mermaid-box">
   <pre class="mermaid">
 flowchart LR
-  subgraph E1["① Données &amp; features"]
-    RAW["Image brute<br>SGUS"] --> ROI["Masquage ROI<br>+ normalisation"]
-    ROI --> FEAT["GLCM · LBP<br>coins Harris"]
-    ROI --> AUG["Augmentation"]
-    FEAT --> DS["SjogrenDataset<br>tenseur multi-canaux"]
-    AUG --> DS
+  subgraph A["1.1 · Données"]
+    RAW["Image brute<br>SGUS"] --> CLEAN["Nettoyage artefacts<br>+ normalisation"]
+    META["CSV métadonnées"] --> SPLIT["Split groupé<br>par patient"]
   end
-  subgraph E2["② Modélisation"]
-    DS --> CNN["CNN scratch"]
-    DS --> RES["ResNet18/50"]
-    DS --> VIT["ViT"]
+  subgraph B["1.2 · Boîte noire"]
+    CLEAN --> CNN["CNN scratch"]
+    CLEAN --> RES["ResNet18/50"]
+    CLEAN --> VIT["ViT"]
   end
-  subgraph E3["③ Explicabilité"]
+  subgraph C["1.3 · Évaluation"]
+    CNN --> EV["k-fold groupé<br>bootstrap · LOCO"]
+    RES --> EV
+    VIT --> EV
+    SPLIT --> EV
+  end
+  subgraph D["1.4 · Explication post-hoc"]
     RES --> SHAP["SHAP"]
     RES --> LIME["LIME"]
-    SHAP --> VAL["Recouvrement<br>explication ∩ ROI"]
-    LIME --> VAL
+    SHAP --> RHO["Concordance<br>ρ · stabilité"]
+    LIME --> RHO
   end
-  subgraph E4["④ Multimodal"]
-    ROI --> CLIP["CLIP gelé"]
-    TXT["Lexique clinique<br>grades 0-3"] --> CLIP
-    CLIP --> SIM["Similarité cosinus<br>zero-shot"]
-  end
-  style E1 fill:#14532d,stroke:#4ade80,color:#dbe2f0
-  style E2 fill:#1e2a4a,stroke:#818cf8,color:#dbe2f0
-  style E3 fill:#3a2d14,stroke:#fbbf24,color:#dbe2f0
-  style E4 fill:#2a1f3d,stroke:#a78bfa,color:#dbe2f0
+  EV --> ANA["1.5 · Analyse<br>interprétation<br>limites"]
+  RHO --> ANA
+  ANA --> P2["Phase 2<br>périmètre à définir"]
+  style A fill:#14532d,stroke:#4ade80,color:#dbe2f0
+  style B fill:#1e2a4a,stroke:#818cf8,color:#dbe2f0
+  style C fill:#3a2d14,stroke:#fbbf24,color:#dbe2f0
+  style D fill:#2a1f3d,stroke:#a78bfa,color:#dbe2f0
+  style ANA fill:#4a1d1d,stroke:#f87171,stroke-width:2px,color:#dbe2f0
+  style P2 stroke-dasharray: 5 5
   </pre>
-  <div class="fig-cap">Fig. 3 — Chaîne complète, de l'image brute à l'alignement vision-langage.</div>
+  <div class="fig-cap">Fig. 3 — Chaîne de la phase 1. L'analyse (en rouge) conditionne l'ouverture de la phase 2.</div>
   </div>
 
   <h3>Arborescence de code prévue</h3>
-  <p><span class="badge todo">aucun module encore écrit</span> — structure cible, à créer au fil des étapes.</p>
-  <pre><code><span class="cm"># structure prévue — sera créée progressivement</span>
+  <p><span class="badge todo">aucun module encore écrit</span> — structure cible de la phase 1, à créer au fil des étapes.</p>
+  <pre><code><span class="cm"># structure prévue — phase 1 uniquement</span>
 sjogren/
 ├── data/
 │   ├── metadata.py      <span class="cm"># lecture CSV, reconstitution de l'identité patient</span>
 │   ├── splits.py        <span class="cm"># découpage groupé par patient, k-fold, leave-one-center-out</span>
-│   ├── preprocess.py    <span class="cm"># masquage ROI, suppression des incrustations, normalisation</span>
-│   └── dataset.py       <span class="cm"># SjogrenDataset (PyTorch)</span>
-├── features/
-│   ├── texture.py       <span class="cm"># GLCM, LBP</span>
-│   └── keypoints.py     <span class="cm"># Harris / Shi-Tomasi</span>
+│   ├── preprocess.py    <span class="cm"># nettoyage des artefacts, normalisation d'intensité</span>
+│   └── dataset.py       <span class="cm"># SjogrenDataset (image seule)</span>
 ├── models/
 │   ├── baseline_cnn.py  <span class="cm"># CNN from scratch</span>
 │   ├── resnet.py        <span class="cm"># transfer learning</span>
@@ -476,103 +468,78 @@ sjogren/
 ├── train/
 │   ├── loop.py          <span class="cm"># boucle d'entraînement, AdamW, perte pondérée</span>
 │   └── metrics.py       <span class="cm"># F1 macro, sensibilité, spécificité, bootstrap</span>
-├── xai/
-│   ├── shap_maps.py
-│   ├── lime_maps.py
-│   └── overlap.py       <span class="cm"># recouvrement explication ∩ ROI</span>
-└── multimodal/
-    ├── prompts.py       <span class="cm"># lexique clinique par grade</span>
-    └── clip_infer.py    <span class="cm"># embeddings, similarité cosinus</span></code></pre>
+└── xai/
+    ├── shap_maps.py     <span class="cm"># attributions SHAP</span>
+    ├── lime_maps.py     <span class="cm"># superpixels LIME</span>
+    ├── overlap.py       <span class="cm"># recouvrement ρ, concordance SHAP/LIME</span>
+    └── stability.py     <span class="cm"># sensibilité aux graines et aux perturbations</span></code></pre>
 </section>
 
-<!-- ══════════════════ 5. ÉTAPE 1 ══════════════════ -->
-<section id="etape1">
-  <h2>5 · Étape 1 — Ingénierie des caractéristiques &amp; pipeline de données</h2>
+<!-- ══════════════════ 5. ÉTAPE 1.1 ══════════════════ -->
+<section id="e11">
+  <h2>5 · Étape 1.1 — Pipeline de données et garanties d'intégrité</h2>
   <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">étape courante</span></p>
 
-  <p><strong>Objectif</strong> — construire un <code>DataLoader</code> robuste qui présente au réseau
-  la texture glandulaire, et rien d'autre.</p>
+  <p><strong>Objectif</strong> — produire un <code>DataLoader</code> dont on peut <em>démontrer</em>
+  qu'il ne fuit pas et qu'il ne présente au modèle que du tissu.</p>
 
-  <h3>5.1 Ordre des opérations</h3>
   <div class="mermaid-box">
   <pre class="mermaid">
 flowchart TB
   A["CSV métadonnées"] --> B["Reconstitution identité patient<br>centre + sexe + âge + durée"]
   B --> C["Découpage groupé par patient<br>StratifiedGroupKFold"]
   D["Image 001.jpg"] --> E["Détection des incrustations<br>texte, bords de sonde"]
-  E --> F["Crop ROI + masquage"]
+  E --> F["Crop + masquage"]
   F --> G["Normalisation d'intensité<br>inter-appareils"]
-  G --> H1["Canal 0 : image"]
-  G --> H2["Canal 1-n : GLCM"]
-  G --> H3["Canal n+1 : LBP"]
-  G --> H4["Canal n+2 : carte de coins"]
-  H1 --> I["Tenseur multi-canaux"]
-  H2 --> I
-  H3 --> I
-  H4 --> I
+  G --> H["Augmentation"]
+  H --> I["SjogrenDataset<br>image seule"]
   C --> I
-  I --> J["SjogrenDataset<br>+ augmentation"]
+  I --> J["Tests d'intégrité<br>aucun patient partagé<br>4 grades par pli"]
   style C fill:#4a1d1d,stroke:#f87171,color:#dbe2f0
   style F fill:#14532d,stroke:#4ade80,color:#dbe2f0
+  style J fill:#3a2d14,stroke:#fbbf24,color:#dbe2f0
   </pre>
-  <div class="fig-cap">Fig. 4 — Le découpage groupé (rouge) et le masquage (vert) sont les deux points critiques.</div>
+  <div class="fig-cap">Fig. 4 — Le découpage groupé (rouge) et le nettoyage des artefacts (vert) sont les deux points critiques ; les tests (jaune) les verrouillent.</div>
   </div>
 
-  <h3>5.2 Descripteurs de texture</h3>
-  <p>La <strong>matrice de co-occurrence des niveaux de gris</strong> (GLCM) compte les paires de pixels
-  séparés d'un déplacement donné. Les propriétés qu'on en extrait quantifient directement
-  l'hétérogénéité recherchée :</p>
-
-  <div class="eq-box">
-  $$\text{Contraste} = \sum_{i,j}(i-j)^2 P(i,j)
-  \qquad
-  \text{Homogénéité} = \sum_{i,j}\frac{P(i,j)}{1+|i-j|}$$
+  <div class="explain">
+    <div class="ct">🎓 Pourquoi le découpage groupé décide de tout le reste</div>
+    <p>Le corpus contient deux images par patient — la parotide et la sous-mandibulaire, prises lors du
+    même examen, sur le même appareil, chez la même personne. Si l'une part en entraînement et l'autre
+    en test, le modèle n'a pas besoin d'apprendre la maladie : il lui suffit de <em>reconnaître le
+    patient</em>, ce qu'un réseau profond fait remarquablement bien.</p>
+    <p>Le score obtenu serait alors excellent et entièrement trompeur. Pire, l'erreur est silencieuse :
+    rien dans les courbes d'entraînement ne la signale. C'est pourquoi l'absence de patient partagé
+    entre plis est vérifiée <em>par un test automatique</em>, et non par une relecture du code.</p>
   </div>
 
-  <p>Le <strong>motif binaire local</strong> (LBP) encode, pour chaque pixel, le signe de l'écart
-  d'intensité avec ses $P$ voisins situés à distance $R$ — une signature de micro-texture robuste
-  aux variations d'éclairage, donc partiellement aux réglages de l'appareil :</p>
-
-  <div class="eq-box">
-  $$\text{LBP}_{P,R}(x_c) = \sum_{p=0}^{P-1} s(g_p - g_c)\,2^p,
-  \qquad s(u) = \begin{cases}1 & u \ge 0\\ 0 & u < 0\end{cases}$$
-  </div>
-
-  <p>La <strong>réponse de Harris</strong> repère les points où l'intensité varie fortement dans
-  les deux directions — utile pour accrocher les structures anatomiques et les frontières glandulaires :</p>
-
-  <div class="eq-box">
-  $$R = \det(M) - k\,(\operatorname{tr} M)^2$$
-  </div>
-
-  <h3>5.3 Livrables de l'étape</h3>
+  <h3>Livrables de l'étape</h3>
   <table>
     <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
     <tr><td>Lecture du CSV et reconstitution de l'identité patient</td><td><code>data/metadata.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td>Découpage groupé par patient, stratifié par grade</td><td><code>data/splits.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Masquage des incrustations et crop de la ROI</td><td><code>data/preprocess.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Extraction GLCM et LBP</td><td><code>features/texture.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Détection de coins Harris / Shi-Tomasi</td><td><code>features/keypoints.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Nettoyage des artefacts et normalisation d'intensité</td><td><code>data/preprocess.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td><code>SjogrenDataset</code> et augmentations</td><td><code>data/dataset.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Tests d'intégrité du découpage</td><td><code>tests/test_splits.py</code></td><td><span class="badge todo">à faire</span></td></tr>
   </table>
 
   <div class="callout">
     <div class="ct">✔ Critère de sortie de l'étape</div>
-    Un <code>DataLoader</code> qui produit des lots de tenseurs multi-canaux, avec la garantie vérifiée
-    par test qu'<strong>aucun patient n'apparaît simultanément en train et en test</strong>, et une
-    planche de contrôle visuel montrant les ROI extraites sur un échantillon des quatre appareils.
+    Un <code>DataLoader</code> produisant des lots d'images nettoyées, les contrôles d'intégrité au vert
+    et reportés dans <a href="results.html">results.html</a>, et une planche de contrôle visuel des
+    régions extraites pour chacun des quatre appareils.
   </div>
 </section>
 
-<!-- ══════════════════ 6. ÉTAPE 2 ══════════════════ -->
-<section id="etape2">
-  <h2>6 · Étape 2 — Modélisation profonde</h2>
+<!-- ══════════════════ 6. ÉTAPE 1.2 ══════════════════ -->
+<section id="e12">
+  <h2>6 · Étape 1.2 — Modèles boîte noire</h2>
   <p class="byline"><span class="badge todo">à faire</span></p>
 
-  <p><strong>Objectif</strong> — comparer trois familles d'architectures sur la tâche multiclasse
-  des grades De Vita, avec la configuration binaire en étude complémentaire.</p>
+  <p><strong>Objectif</strong> — entraîner les classifieurs sur l'image seule, en configuration
+  multiclasse (grades De Vita 0-3).</p>
 
-  <h3>6.1 Les trois architectures et ce qu'elles testent</h3>
+  <h3>Les trois architectures et ce qu'elles testent</h3>
   <table>
     <tr><th>Modèle</th><th>Rôle dans l'étude</th><th>Hypothèse testée</th></tr>
     <tr><td><strong>CNN from scratch</strong><br>3 à 5 couches conv.</td><td>Référence interne</td><td>Quelle performance atteint-on sans connaissance externe, sur 225 images seulement ?</td></tr>
@@ -585,10 +552,10 @@ flowchart TB
     Le rapport entre la taille du corpus et la capacité des modèles pré-entraînés rend le
     <strong>surapprentissage quasi certain</strong> sans précautions : gel partiel des couches basses,
     augmentation soutenue, arrêt anticipé sur le F1 macro de validation, et régularisation.
-    Le CNN from scratch, plus petit, sert justement de point de comparaison sur ce terrain.
+    Le CNN from scratch, plus petit, sert de point de comparaison sur ce terrain.
   </div>
 
-  <h3>6.2 Fonction de perte et sélection de modèle</h3>
+  <h3>Fonction de perte et sélection de modèle</h3>
   <div class="eq-box">
   $$\mathcal{L} = -\sum_{k=0}^{K-1} w_k \, y_k \log \hat{p}_k
   \qquad
@@ -598,45 +565,81 @@ flowchart TB
   est celui qui maximise le <strong>F1 macro</strong> en validation — jamais l'accuracy, qui récompense
   le raccourci « tout grade 0 ».</p>
 
-  <h3>6.3 Livrables de l'étape</h3>
+  <h3>Livrables de l'étape</h3>
   <table>
     <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
     <tr><td>CNN from scratch</td><td><code>models/baseline_cnn.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td>ResNet18/50 adapté multiclasse et binaire</td><td><code>models/resnet.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td>Vision Transformer</td><td><code>models/vit.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td>Boucle d'entraînement, AdamW, perte pondérée</td><td><code>train/loop.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Métriques, bootstrap, matrice de confusion</td><td><code>train/metrics.py</code></td><td><span class="badge todo">à faire</span></td></tr>
   </table>
 </section>
 
-<!-- ══════════════════ 7. ÉTAPE 3 ══════════════════ -->
-<section id="etape3">
-  <h2>7 · Étape 3 — Explicabilité, casser la boîte noire</h2>
+<!-- ══════════════════ 7. ÉTAPE 1.3 ══════════════════ -->
+<section id="e13">
+  <h2>7 · Étape 1.3 — Protocole d'évaluation</h2>
   <p class="byline"><span class="badge todo">à faire</span></p>
 
-  <p><strong>Objectif</strong> — établir que le modèle fonde sa décision sur la texture du parenchyme,
-  et non sur un artefact corrélé. C'est la condition d'acceptabilité clinique du système.</p>
+  <p><strong>Objectif</strong> — produire des chiffres défendables, et non un score unique issu d'un
+  découpage favorable. Sur 225 images, la variance entre découpages est forte.</p>
+
+  <h3>Schémas de validation</h3>
+  <table>
+    <tr><th>Schéma</th><th>Ce qu'il mesure</th><th>Contrainte respectée</th></tr>
+    <tr><td><strong>k-fold stratifié groupé</strong></td><td>Performance moyenne et sa variabilité</td><td>Groupement par patient · stratification par grade</td></tr>
+    <tr><td><strong>Leave-one-center-out</strong></td><td>Généralisation à un appareil jamais vu</td><td>Teste directement la confusion centre/appareil</td></tr>
+    <tr><td><strong>Bootstrap sur le test</strong></td><td>Intervalles de confiance de chaque métrique</td><td>Rééchantillonnage au niveau patient</td></tr>
+  </table>
+
+  <h3>Métriques rapportées</h3>
+  <table>
+    <tr><th>Métrique</th><th>Pourquoi</th></tr>
+    <tr><td><strong>F1 macro</strong></td><td>Métrique de sélection — traite les quatre grades à parité malgré le déséquilibre</td></tr>
+    <tr><td><strong>Sensibilité par grade</strong></td><td>Manquer une atteinte débutante (grade 1) est l'erreur cliniquement la plus coûteuse</td></tr>
+    <tr><td><strong>Spécificité</strong></td><td>Limiter les faux positifs, qui déclencheraient des explorations inutiles</td></tr>
+    <tr><td><strong>Matrice de confusion</strong></td><td>Distingue les confusions entre grades voisins (tolérables) des confusions extrêmes (graves)</td></tr>
+    <tr><td><strong>AUC</strong></td><td>Comparabilité avec la littérature, en one-vs-rest pour le multiclasse</td></tr>
+    <tr><td><strong>Accuracy</strong></td><td>Rapportée pour référence uniquement — <em>jamais</em> utilisée pour sélectionner un modèle</td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="ct">📌 Référence de base à battre</div>
+    Tout modèle doit être comparé au classifieur trivial qui prédit systématiquement le grade
+    majoritaire : <strong>48,9 % d'accuracy</strong>, mais un <strong>F1 macro de 0,164</strong>.
+    Cet écart entre les deux chiffres est l'illustration la plus directe de pourquoi l'accuracy est
+    trompeuse sur ce corpus.
+  </div>
+</section>
+
+<!-- ══════════════════ 8. ÉTAPE 1.4 ══════════════════ -->
+<section id="e14">
+  <h2>8 · Étape 1.4 — Explication post-hoc</h2>
+  <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">cœur de la phase 1</span></p>
+
+  <p><strong>Objectif</strong> — déterminer <em>après coup</em> sur quoi le modèle fonde ses décisions,
+  avec deux méthodes indépendantes, et mesurer jusqu'où ces explications sont fiables.</p>
 
   <div class="mermaid-box">
   <pre class="mermaid">
 flowchart LR
-  M["Modèle entraîné<br>ResNet / ViT"] --> S["SHAP<br>attributions par pixel"]
+  M["Modèle entraîné<br>boîte noire"] --> S["SHAP<br>attributions par pixel"]
   M --> L["LIME<br>superpixels"]
   S --> C["Concordance<br>SHAP ∩ LIME"]
   L --> C
-  S --> O["Recouvrement<br>avec la ROI glandulaire"]
+  S --> O["Recouvrement ρ<br>avec la région glandulaire"]
   L --> O
-  C --> V{"Explications<br>cohérentes et<br>dans la glande ?"}
-  O --> V
-  V -->|oui| OK["Focus anatomique validé"]
-  V -->|non| KO["Retour Étape 1<br>masquage à renforcer"]
-  style OK fill:#14532d,stroke:#4ade80,color:#dbe2f0
-  style KO fill:#4a1d1d,stroke:#f87171,color:#dbe2f0
+  S --> ST["Stabilité<br>graines · perturbations"]
+  L --> ST
+  C --> R["Lecture croisée<br>avec la sémiologie clinique"]
+  O --> R
+  ST --> R
+  R --> A["1.5 · Analyse et limites"]
+  style A fill:#4a1d1d,stroke:#f87171,stroke-width:2px,color:#dbe2f0
   </pre>
-  <div class="fig-cap">Fig. 5 — L'XAI comme boucle de contrôle sur le prétraitement, pas seulement comme illustration finale.</div>
+  <div class="fig-cap">Fig. 5 — Trois mesures indépendantes — concordance, recouvrement, stabilité — avant toute interprétation.</div>
   </div>
 
-  <h3>7.1 Deux méthodes, deux angles</h3>
+  <h3>8.1 Deux méthodes, deux angles</h3>
   <table>
     <tr><th>Méthode</th><th>Principe</th><th>Force</th><th>Limite</th></tr>
     <tr><td><strong>SHAP</strong><br><code>DeepExplainer</code> / <code>GradientExplainer</code></td><td>Attribution par pixel fondée sur les valeurs de Shapley, via les gradients internes</td><td>Granularité fine, fondement théorique</td><td>Coûteux, sensible au choix des données de référence</td></tr>
@@ -654,105 +657,87 @@ flowchart LR
     triangulation en méthodologie expérimentale.</p>
   </div>
 
-  <h3>7.2 Mesure du focus anatomique</h3>
-  <p>Plutôt que de juger les heatmaps à l'œil, on quantifie la fraction de la saillance qui tombe
-  dans le masque glandulaire :</p>
+  <h3>8.2 Mesure du focus anatomique</h3>
+  <p>Plutôt que de juger les cartes de saillance à l'œil, on quantifie la fraction de la saillance qui
+  tombe dans la région glandulaire :</p>
   <div class="eq-box">
   $$\rho = \frac{\sum_{p \in \text{ROI}} |a_p|}{\sum_{p} |a_p|}$$
   </div>
   <p>avec $a_p$ l'attribution du pixel $p$. Un $\rho$ élevé signifie que le modèle regarde bien la
-  glande. Cette mesure est comparable entre modèles et entre conditions de prétraitement, ce qui en
-  fait un critère d'évaluation à part entière — et non une simple illustration.</p>
-
-  <h3>7.3 Livrables de l'étape</h3>
-  <table>
-    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
-    <tr><td>Heatmaps SHAP superposées</td><td><code>xai/shap_maps.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Superpixels LIME</td><td><code>xai/lime_maps.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Métrique de recouvrement ρ et concordance</td><td><code>xai/overlap.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Export haute résolution pour le manuscrit</td><td><code>xai/export.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-  </table>
-</section>
-
-<!-- ══════════════════ 8. ÉTAPE 4 ══════════════════ -->
-<section id="etape4">
-  <h2>8 · Étape 4 — Alignement vision-langage avec CLIP</h2>
-  <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">cœur de la thèse</span></p>
-
-  <p><strong>Objectif</strong> — sortir de la classification pure et faire dialoguer l'image avec du
-  texte clinique, première brique d'une architecture RAG.</p>
-
-  <h3>8.1 Principe</h3>
-  <p>CLIP projette images et phrases dans un <strong>espace commun</strong>. Classer une image revient
-  alors à chercher la description clinique dont l'<em>embedding</em> lui est le plus proche :</p>
-  <div class="eq-box">
-  $$\operatorname{sim}(z_I, z_T) = \frac{z_I \cdot z_T}{\lVert z_I \rVert \, \lVert z_T \rVert}
-  \qquad
-  \hat{k} = \arg\max_k \operatorname{sim}(z_I, z_{T_k})$$
-  </div>
-
-  <h3>8.2 Le lexique clinique</h3>
-  <p>Les « ancres » du système sont littéralement des phrases, une par grade. Leur formulation est un
-  objet d'étude à part entière : elle encode le savoir clinique sous une forme que le modèle comprend.</p>
-  <pre><code><span class="cm"># esquisse du lexique — formulations à affiner et à faire valider cliniquement</span>
-PROMPTS = {
-    <span class="nb">0</span>: <span class="st">"échographie d'une glande salivaire saine, parenchyme homogène"</span>,
-    <span class="nb">1</span>: <span class="st">"échographie d'une glande salivaire, hétérogénéité légère du parenchyme"</span>,
-    <span class="nb">2</span>: <span class="st">"échographie d'une glande salivaire, hétérogénéité modérée avec zones hypoéchogènes"</span>,
-    <span class="nb">3</span>: <span class="st">"échographie d'une glande salivaire, hétérogénéité sévère avec zones anéchoïques diffuses"</span>,
-}</code></pre>
-
-  <div class="callout warn">
-    <div class="ct">⚠ Un modèle entraîné sur des images naturelles</div>
-    CLIP n'a pas vu d'échographies pendant son pré-entraînement. Un résultat zero-shot faible serait
-    donc un <strong>constat attendu et informatif</strong>, non un échec : il justifierait le recours à
-    une variante biomédicale ou à un ajustement léger. Ce point est consigné <em>avant</em> la mesure,
-    pour ne pas réinterpréter le résultat après coup.
-  </div>
-
-  <h3>8.3 Livrables de l'étape</h3>
-  <table>
-    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
-    <tr><td>Lexique clinique par grade</td><td><code>multimodal/prompts.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Extraction d'embeddings et similarité</td><td><code>multimodal/clip_infer.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Évaluation zero-shot sur les 4 grades</td><td><code>multimodal/eval_zeroshot.py</code></td><td><span class="badge todo">à faire</span></td></tr>
-    <tr><td>Recherche de cas similaires (image-to-image)</td><td><code>multimodal/retrieval.py</code></td><td><span class="badge todo">horizon</span></td></tr>
-  </table>
-</section>
-
-<!-- ══════════════════ 9. PROTOCOLE ══════════════════ -->
-<section id="protocole">
-  <h2>9 · Protocole d'évaluation</h2>
-
-  <p>Sur 225 images, un score unique issu d'un découpage unique n'a <strong>aucune valeur
-  statistique</strong>. Le protocole ci-dessous est fixé avant les premières mesures.</p>
-
-  <h3>9.1 Schémas de validation</h3>
-  <table>
-    <tr><th>Schéma</th><th>Ce qu'il mesure</th><th>Contrainte respectée</th></tr>
-    <tr><td><strong>k-fold stratifié groupé</strong></td><td>Performance moyenne et sa variabilité</td><td>Groupement par patient · stratification par grade</td></tr>
-    <tr><td><strong>Leave-one-center-out</strong></td><td>Généralisation à un appareil jamais vu</td><td>Teste directement la confusion centre/appareil</td></tr>
-    <tr><td><strong>Bootstrap sur le test</strong></td><td>Intervalles de confiance de chaque métrique</td><td>Rééchantillonnage au niveau patient</td></tr>
-  </table>
-
-  <h3>9.2 Métriques rapportées</h3>
-  <table>
-    <tr><th>Métrique</th><th>Pourquoi</th></tr>
-    <tr><td><strong>F1 macro</strong></td><td>Métrique de sélection — traite les quatre grades à parité malgré le déséquilibre</td></tr>
-    <tr><td><strong>Sensibilité par grade</strong></td><td>Manquer une atteinte débutante (grade 1) est l'erreur cliniquement la plus coûteuse</td></tr>
-    <tr><td><strong>Spécificité</strong></td><td>Limiter les faux positifs, qui déclencheraient des explorations inutiles</td></tr>
-    <tr><td><strong>Matrice de confusion</strong></td><td>Distingue les confusions entre grades voisins (tolérables) des confusions extrêmes (graves)</td></tr>
-    <tr><td><strong>AUC</strong></td><td>Comparabilité avec la littérature, en one-vs-rest pour le multiclasse</td></tr>
-    <tr><td><strong>Recouvrement ρ</strong></td><td>Métrique d'explicabilité — le modèle regarde-t-il la glande ?</td></tr>
-    <tr><td><strong>Accuracy</strong></td><td>Rapportée pour référence uniquement — <em>jamais</em> utilisée pour sélectionner un modèle</td></tr>
-  </table>
+  glande. Cette mesure est comparable entre modèles et entre conditions, ce qui en fait un critère
+  d'évaluation à part entière — et non une simple illustration.</p>
 
   <div class="callout">
-    <div class="ct">📌 Référence de base à battre</div>
-    Tout modèle doit être comparé au classifieur trivial qui prédit systématiquement le grade
-    majoritaire : <strong>48,9 % d'accuracy</strong>, mais un <strong>F1 macro de 0,164</strong>.
-    Cet écart entre les deux chiffres est l'illustration la plus directe de pourquoi l'accuracy est
-    trompeuse sur ce corpus.
+    <div class="ct">🎯 D'où vient la région glandulaire — et pourquoi cela ne rompt pas la boîte noire</div>
+    Le calcul de ρ suppose une définition de la glande. Les auteurs du corpus HarmonicSS publient des
+    <strong>modèles de segmentation de glande salivaire pré-entraînés sur ces mêmes images</strong>
+    (FCN, FCN-DenseNet, U-Net, LinkNet), ce qui évite un travail d'annotation manuelle — voir
+    l'<a href="datasets_disponibles.html#exploitable">annexe sur les corpus disponibles</a>.
+    <br><br>
+    Ce masque est employé <strong>exclusivement comme instrument de mesure</strong> : il n'entre jamais
+    dans l'image fournie au réseau. Le modèle reste une boîte noire nourrie de l'image seule ; le masque
+    sert uniquement à <em>évaluer où tombe la saillance</em> de ses explications. L'utiliser comme filtre
+    d'entrée reviendrait à fournir au modèle une région tracée par des experts — cela relèverait
+    de la phase 2.
+  </div>
+
+  <h3>8.3 Stabilité — la mesure qu'on oublie souvent</h3>
+  <p>Une carte de saillance qui change lorsqu'on change la graine aléatoire, la segmentation en
+  superpixels ou le jeu de référence de SHAP ne dit rien de fiable sur le modèle. La phase 1 mesure
+  donc explicitement :</p>
+  <ul>
+    <li>la variation des cartes entre <strong>graines</strong> différentes ;</li>
+    <li>la sensibilité de LIME au nombre et à la taille des <strong>superpixels</strong> ;</li>
+    <li>la sensibilité de SHAP au choix des <strong>données de référence</strong> ;</li>
+    <li>la variation sous <strong>petites perturbations</strong> de l'image d'entrée.</li>
+  </ul>
+
+  <h3>8.4 Explications des erreurs</h3>
+  <p>Les cartes des cas <strong>mal classés</strong> sont analysées au même titre que celles des cas
+  corrects, par grade. C'est souvent là que se lit le mécanisme réel de la décision.</p>
+
+  <h3>Livrables de l'étape</h3>
+  <table>
+    <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
+    <tr><td>Cartes d'attribution SHAP</td><td><code>xai/shap_maps.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Superpixels LIME</td><td><code>xai/lime_maps.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Recouvrement ρ et concordance SHAP/LIME</td><td><code>xai/overlap.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Analyse de stabilité</td><td><code>xai/stability.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════ 9. ÉTAPE 1.5 ══════════════════ -->
+<section id="e15">
+  <h2>9 · Étape 1.5 — Analyse, interprétation et limites</h2>
+  <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">livrable scientifique de la phase</span></p>
+
+  <p><strong>Objectif</strong> — interpréter les résultats et énoncer honnêtement leur portée.
+  Cette étape ne produit pas de code : elle produit le <strong>raisonnement</strong> qui sera défendu
+  devant l'encadrant, puis repris dans le manuscrit.</p>
+
+  <h3>Les cinq questions auxquelles l'étape doit répondre</h3>
+  <table>
+    <tr><th>#</th><th>Question</th><th>Éléments mobilisés</th></tr>
+    <tr><td>1</td><td><strong>Sur quoi le modèle s'appuie-t-il réellement ?</strong> Les régions saillantes correspondent-elles à la sémiologie clinique (section 2.1) ou à autre chose ?</td><td>ρ, concordance SHAP/LIME, lecture croisée avec les signes cliniques</td></tr>
+    <tr><td>2</td><td><strong>Où échoue-t-il ?</strong> Comportement sur le grade 1 (28 images), confusions entre grades voisins, cas systématiquement mal classés</td><td>Matrice de confusion, sensibilité par grade, cartes des erreurs</td></tr>
+    <tr><td>3</td><td><strong>A-t-il appris l'appareil ?</strong> Lecture de l'écart entre k-fold et leave-one-center-out</td><td>LOCO, cartes de saillance par centre</td></tr>
+    <tr><td>4</td><td><strong>Les explications sont-elles fiables ?</strong> Ce que SHAP et LIME établissent réellement, leurs désaccords, leur dépendance aux réglages</td><td>Mesures de stabilité (8.3), désaccords SHAP/LIME</td></tr>
+    <tr><td>5</td><td><strong>Que l'approche boîte noire ne peut-elle pas apporter ?</strong></td><td>Synthèse des quatre questions précédentes</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <div class="ct">⚠ Une carte de saillance n'est pas une explication causale</div>
+    SHAP et LIME indiquent quelles régions <strong>influencent la sortie du modèle</strong> — pas
+    quelles régions <em>causent</em> la maladie, ni sur quoi un clinicien devrait fonder son diagnostic.
+    Confondre les deux est l'erreur d'interprétation la plus fréquente en XAI médicale. Cette distinction
+    sera tenue explicitement dans la rédaction de l'analyse.
+  </div>
+
+  <div class="callout">
+    <div class="ct">✔ Critère de sortie de la phase 1</div>
+    Une section d'analyse rédigée ici même, une section « Limites » à jour dans
+    <a href="results.html">results.html</a>, et une réponse argumentée à la question 5 — c'est elle
+    qui détermine le périmètre de la phase 2.
   </div>
 </section>
 
@@ -760,17 +745,18 @@ PROMPTS = {
 <section id="integrite">
   <h2>10 · Intégrité scientifique</h2>
 
-  <p>Les règles ci-dessous sont posées à l'ouverture du projet, avant toute mesure, pour que les
+  <p>Les règles ci-dessous sont posées à l'ouverture de la phase, avant toute mesure, pour que les
   résultats restent interprétables et défendables.</p>
 
   <table>
     <tr><th>Règle</th><th>Raison</th></tr>
     <tr><td>Le découpage est <strong>groupé par patient</strong>, sans exception</td><td>Seul rempart contre la fuite de données, qui invaliderait l'ensemble des résultats</td></tr>
     <tr><td>Le jeu de test n'est consulté qu'<strong>une seule fois</strong>, en fin d'étape</td><td>Chaque décision prise en regardant le test le transforme en jeu de validation déguisé</td></tr>
-    <tr><td>Tout chiffre affiché ici provient d'un <strong>run tracé</strong></td><td>Aucune valeur recopiée de mémoire ou estimée</td></tr>
+    <tr><td>Tout chiffre affiché provient d'un <strong>run tracé</strong></td><td>Aucune valeur recopiée de mémoire ou estimée</td></tr>
     <tr><td>Les hypothèses sont écrites <strong>avant</strong> la mesure</td><td>Empêche la réinterprétation a posteriori d'un résultat décevant</td></tr>
-    <tr><td>Un résultat négatif est <strong>consigné, pas effacé</strong></td><td>Un zero-shot CLIP faible est une information, pas un échec à masquer</td></tr>
+    <tr><td>Un résultat négatif est <strong>consigné, pas effacé</strong></td><td>Une performance faible ou des explications instables sont des informations, pas des échecs à masquer</td></tr>
     <tr><td>Les graines aléatoires sont <strong>fixées et reportées</strong></td><td>Reproductibilité sur un corpus où la variance entre découpages est forte</td></tr>
+    <tr><td>Rien n'est documenté qui ne soit <strong>arrêté</strong></td><td>Une page de suivi décrivant des travaux non engagés induit en erreur sur l'état réel du projet</td></tr>
   </table>
 
   <div class="callout danger">
@@ -782,56 +768,85 @@ PROMPTS = {
   </div>
 </section>
 
-<!-- ══════════════════ 11. STATUT ══════════════════ -->
+<!-- ══════════════════ 11. PHASE 2 ══════════════════ -->
+<section id="phase2">
+  <h2>11 · Phase 2 — intégration de l'expertise humaine</h2>
+  <p class="byline"><span class="badge todo">différée</span></p>
+
+  <p><strong>Le périmètre de cette phase sera défini avec l'encadrant à l'issue de la phase 1.</strong>
+  Aucun choix technique n'est arrêté, et aucun développement n'est engagé.</p>
+
+  <p>Les pistes ci-dessous ont été évoquées au cours du cadrage du projet et sont conservées comme
+  mémoire de travail. Elles <strong>ne constituent pas un engagement</strong> et ne sont pas détaillées
+  tant que la phase 1 n'a pas établi ses limites :</p>
+  <ul>
+    <li>descripteurs de texture calculés et points d'intérêt structurels injectés en amont du réseau ;</li>
+    <li>régions d'intérêt ou annotations fournies par un clinicien ;</li>
+    <li>alignement vision-langage à partir d'un lexique clinique.</li>
+  </ul>
+
+  <div class="callout">
+    <div class="ct">🔗 Pourquoi la phase 1 décide du contenu de la phase 2</div>
+    Le choix entre ces pistes dépend directement de la question 5 de l'étape 1.5 : <em>que l'approche
+    boîte noire ne peut-elle pas apporter ?</em> Si les explications montrent que le modèle ignore la
+    texture fine, injecter des descripteurs de texture devient pertinent. Si elles montrent qu'il
+    s'appuie sur des régions hors glande, c'est une région d'intérêt experte qu'il faut fournir.
+    Décider maintenant reviendrait à choisir le remède avant le diagnostic.
+  </div>
+</section>
+
+<!-- ══════════════════ 12. STATUT ══════════════════ -->
 <section id="statut">
-  <h2>11 · Statut d'implémentation &amp; feuille de route</h2>
+  <h2>12 · Statut d'implémentation &amp; feuille de route</h2>
 
   <div class="cards">
     <div class="card"><div class="t">✅ Fait</div>
       <div class="d">Cadrage scientifique et plan de travail (<code>Plan.md</code>) ·
       acquisition et inspection du corpus HarmonicSS · caractérisation statistique des 225 images ·
       identification des trois contraintes structurelles · protocole d'évaluation fixé ·
-      ce document de suivi.</div></div>
+      documents de suivi et de résultats.</div></div>
     <div class="card"><div class="t">🚧 Étape courante</div>
-      <div class="d"><strong>Étape 1</strong> — reconstitution de l'identité patient, découpage groupé,
-      masquage de la ROI, extraction GLCM/LBP/coins, <code>SjogrenDataset</code>.</div></div>
+      <div class="d"><strong>Étape 1.1</strong> — reconstitution de l'identité patient, découpage groupé,
+      nettoyage des artefacts, <code>SjogrenDataset</code>, tests d'intégrité.</div></div>
     <div class="card"><div class="t">🔭 Horizon</div>
-      <div class="d">Étapes 2 à 4 · variante ordinale de la perte · variante biomédicale de CLIP ·
-      recherche de cas similaires et architecture RAG.</div></div>
+      <div class="d">Étapes 1.2 à 1.5, puis définition du périmètre de la phase 2 avec l'encadrant,
+      à partir des limites établies.</div></div>
   </div>
 
   <div class="mermaid-box">
   <pre class="mermaid">
 flowchart LR
   A["<b>Fait</b><br>Cadrage · corpus<br>contraintes · protocole"] -->
-  B["<b>Étape 1</b><br>Split groupé patient<br>masquage ROI<br>GLCM · LBP · coins"] -->
-  C["<b>Étape 2</b><br>CNN · ResNet · ViT<br>multiclasse 0-3<br>k-fold + bootstrap"] -->
-  D["<b>Étape 3</b><br>SHAP + LIME<br>recouvrement ρ"] -->
-  E["<b>Étape 4</b><br>CLIP zero-shot<br>lexique clinique"] -->
-  F["<b>Horizon</b><br>RAG · cas similaires"]
+  B["<b>1.1</b><br>Split groupé patient<br>nettoyage artefacts<br>tests d'intégrité"] -->
+  C["<b>1.2</b><br>CNN · ResNet · ViT<br>image seule<br>multiclasse 0-3"] -->
+  D["<b>1.3</b><br>k-fold · bootstrap<br>leave-one-center-out"] -->
+  E["<b>1.4</b><br>SHAP + LIME<br>ρ · concordance<br>stabilité"] -->
+  F["<b>1.5</b><br>Analyse<br>interprétation<br>limites"] -->
+  G["<b>Phase 2</b><br>expertise humaine<br>périmètre à définir"]
   style A fill:#14532d,stroke:#4ade80,color:#dbe2f0
   style B fill:#1e2a4a,stroke:#818cf8,stroke-width:2px,color:#dbe2f0
-  style F stroke-dasharray: 5 5
+  style F fill:#4a1d1d,stroke:#f87171,color:#dbe2f0
+  style G stroke-dasharray: 5 5
   </pre>
-  <div class="fig-cap">Fig. 6 — Trajectoire du projet. L'étape en cours est encadrée.</div>
+  <div class="fig-cap">Fig. 6 — Trajectoire de la phase 1. L'étape en cours est encadrée.</div>
   </div>
 
   <h3>Tableau de bord des résultats</h3>
-  <p>Ce tableau se remplit au fil des runs. <span class="badge todo">aucune mesure disponible</span></p>
+  <p>Ce tableau se remplit au fil des runs. <span class="badge todo">aucune mesure disponible</span>
+  Détail complet et traçabilité : <a href="results.html">page résultats</a>.</p>
   <table>
     <tr><th>Modèle</th><th>Tâche</th><th>F1 macro</th><th>Sensibilité grade 1</th><th>ρ (focus ROI)</th><th>Run</th></tr>
     <tr><td>CNN scratch</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
     <tr><td>ResNet18</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
     <tr><td>ResNet50</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
     <tr><td>ViT</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-    <tr><td>CLIP zero-shot</td><td>multiclasse 0-3</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
     <tr><td><em>Classifieur trivial</em></td><td>multiclasse 0-3</td><td>0.164</td><td>0.000</td><td>—</td><td>analytique</td></tr>
   </table>
 
   <h3>Hiérarchie des sources du projet</h3>
   <table>
     <tr><th>Document</th><th>Statut</th></tr>
-    <tr><td><code>Plan.md</code></td><td><span class="badge core">autoritatif</span> plan de travail et contributions visées</td></tr>
+    <tr><td><code>Plan.md</code></td><td><span class="badge core">autoritatif</span> plan de travail et découpage en phases</td></tr>
     <tr><td><code>HarmonicSS benchmark dataset/Anonymized images - Info.csv</code></td><td><span class="badge ok">seule source</span> des annotations et métadonnées</td></tr>
     <tr><td><code>outputs/&lt;run_id&gt;/metrics.json</code></td><td><span class="badge ok">seule source</span> d'une valeur de performance</td></tr>
     <tr><td><code>.claude/agents/sjogren-dl-engineer.md</code></td><td><span class="badge core">autoritatif</span> contexte de développement</td></tr>
@@ -840,9 +855,9 @@ flowchart LR
   </table>
 </section>
 
-<!-- ══════════════════ 12. JOURNAL ══════════════════ -->
+<!-- ══════════════════ 13. JOURNAL ══════════════════ -->
 <section id="journal">
-  <h2>12 · Journal des travaux</h2>
+  <h2>13 · Journal des travaux</h2>
 
   <p>Trace chronologique des décisions et des étapes franchies. Une ligne par événement marquant.</p>
 
@@ -851,8 +866,7 @@ flowchart LR
     <tr>
       <td><code>2026-09-19</code></td>
       <td>Ouverture du suivi</td>
-      <td>Création de ce document. Plan de travail arrêté en 4 étapes, protocole d'évaluation fixé
-      avant toute mesure.</td>
+      <td>Création des documents de suivi et de résultats. Protocole d'évaluation fixé avant toute mesure.</td>
     </tr>
     <tr>
       <td><code>2026-09-19</code></td>
@@ -860,6 +874,36 @@ flowchart LR
       <td>225 images inspectées. Distribution des grades De Vita établie (110 / 28 / 55 / 32).
       Trois contraintes structurelles identifiées : fuite patient, confusion centre/appareil,
       déséquilibre de classes.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-20</code></td>
+      <td><strong>Restructuration en deux phases</strong></td>
+      <td>Sur retour de l'encadrant : le projet est redécoupé en phase 1 (boîte noire + explication
+      post-hoc) et phase 2 (intégration de l'expertise humaine, périmètre à définir). L'avancement se
+      fait phase par phase, chacune devant être achevée et analysée avant l'ouverture de la suivante.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-20</code></td>
+      <td>Ingénierie des caractéristiques reportée en phase 2</td>
+      <td>Les descripteurs de texture calculés (GLCM, LBP) et les points d'intérêt sont retirés de la
+      phase 1 : injecter des caractéristiques conçues par un humain relève de l'expertise dans la chaîne.
+      La phase 1 travaille sur l'image seule. Seul le nettoyage des artefacts d'acquisition est conservé,
+      au titre de l'hygiène des données.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-20</code></td>
+      <td>Région de référence pour ρ — masques de segmentation en instrument de mesure</td>
+      <td>Le calcul du recouvrement ρ (étape 1.4) s'appuiera sur les modèles de segmentation de glande
+      pré-entraînés publiés avec le corpus HarmonicSS, ce qui évite un travail d'annotation manuelle.
+      Ces masques sont déclarés <strong>instrument de mesure uniquement</strong> : ils n'entrent jamais
+      dans l'image fournie au réseau. Les employer comme filtre d'entrée relèverait de la phase 2.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-20</code></td>
+      <td>Retrait du contenu non arrêté</td>
+      <td>Les développements relatifs à l'alignement vision-langage et à l'architecture RAG sont retirés
+      des documents de suivi et de résultats : ils ne font l'objet d'aucun engagement. Ils figurent
+      désormais comme pistes non arrêtées de la phase 2.</td>
     </tr>
   </table>
 

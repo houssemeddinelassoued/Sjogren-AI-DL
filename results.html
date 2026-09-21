@@ -67,17 +67,20 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème clair" title="Activer le thème clair">☀</button>
 <header>
   <nav><a href="research_works.html">← Travaux de recherche</a></nav>
-  <h1>Résultats — gradation du syndrome de Sjögren</h1>
+  <h1>Résultats — phase 1, boîte noire et explication post-hoc</h1>
   <p class="byline">Travaux de recherche réalisés par <strong>Houssem Eddine Lassoued</strong>,
   encadré par <strong>Dr. Anis Ben Aicha</strong> et <strong>Pr. Habib Fathallah</strong>.</p>
-  <p class="lead">Toutes les mesures produites par le projet, étape par étape : contrôles du pipeline de
-  données, classification des grades De Vita 0-3, robustesse inter-appareils, explicabilité, et
-  alignement vision-langage. Chaque chiffre de cette page doit provenir d'un
+  <p class="lead">Toutes les mesures produites par la phase 1, étape par étape : contrôles du pipeline
+  de données, classification des grades De Vita 0-3 sur l'image seule, robustesse inter-appareils,
+  explication post-hoc et sa fiabilité. Chaque chiffre de cette page doit provenir d'un
   <code>outputs/&lt;run_id&gt;/metrics.json</code> tracé — aucune valeur recopiée de mémoire.</p>
   <div class="project-context">
     <strong>Contexte du projet.</strong> Travaux de thèse en Machine Learning et Deep Learning appliqués
     aux maladies auto-immunes. Corpus HarmonicSS SGUS : 225 images d'échographie des glandes salivaires,
     annotées selon le score De Vita (grades 0 à 3).<br>
+    <strong>Périmètre de cette page : la phase 1 uniquement.</strong> Le modèle ne reçoit que l'image —
+    aucun descripteur calculé, aucune région experte, aucun lexique clinique. La phase 2 (intégration de
+    l'expertise humaine) n'est pas engagée et ne figure pas ici.<br>
     Méthodologie et justification des choix : voir <a href="research_works.html">Travaux de recherche</a>.
   </div>
 </header>
@@ -93,7 +96,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 
 <!-- ══════════════ PROTOCOLE ══════════════ -->
 <h2>Protocole de mesure</h2>
-<p>Conditions d'évaluation fixées à l'ouverture du projet. Toute mesure reportée ici les respecte,
+<p>Conditions d'évaluation fixées à l'ouverture de la phase. Toute mesure reportée ici les respecte,
 ou indique explicitement en quoi elle s'en écarte.</p>
 
 <table>
@@ -105,6 +108,7 @@ ou indique explicitement en quoi elle s'en écarte.</p>
 <tr><td>P5</td><td>Métrique de sélection : <strong>F1 macro</strong></td><td>L'accuracy est rapportée pour référence, jamais utilisée pour choisir un modèle</td></tr>
 <tr><td>P6</td><td>Test consulté une seule fois</td><td>En fin d'étape, après figement de toutes les décisions</td></tr>
 <tr><td>P7</td><td>Graines fixées et reportées</td><td>Reproductibilité — la variance entre découpages est forte sur 225 images</td></tr>
+<tr><td>P8</td><td><strong>Entrée : image seule</strong></td><td>Contrainte de la phase 1 — aucun descripteur calculé ni annotation experte en entrée du réseau</td></tr>
 </table>
 
 <h3>Référence de base — le classifieur trivial</h3>
@@ -125,8 +129,8 @@ Tout modèle doit être comparé à cette ligne.</p>
   à 0,164 — et tant qu'on ne sait pas s'il détecte un seul grade 1.
 </div>
 
-<!-- ══════════════ ÉTAPE 1 ══════════════ -->
-<h2>Étape 1 — Contrôles du pipeline de données</h2>
+<!-- ══════════════ ÉTAPE 1.1 ══════════════ -->
+<h2>Étape 1.1 — Contrôles du pipeline de données</h2>
 <p class="byline"><span class="pill pending">en attente</span></p>
 <p>Ces contrôles ne sont pas des résultats de performance : ce sont les <strong>garanties</strong> sans
 lesquelles aucun chiffre des étapes suivantes n'est interprétable.</p>
@@ -140,50 +144,34 @@ lesquelles aucun chiffre des étapes suivantes n'est interprétable.</p>
 <tr><td>Images perdues au prétraitement</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
 </table>
 
-<h3>Masquage de la région d'intérêt</h3>
+<h3>Nettoyage des artefacts d'acquisition</h3>
 <table>
-<tr><th>Appareil</th><th>Images</th><th>Surface ROI moyenne (% de l'image)</th><th>Incrustations détectées</th><th>Échecs de masquage</th></tr>
+<tr><th>Appareil</th><th>Images</th><th>Surface conservée (% de l'image)</th><th>Incrustations détectées</th><th>Échecs de nettoyage</th></tr>
 <tr><td>Samsung (Udine)</td><td>75</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
 <tr><td>GE (Belgrade)</td><td>53</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
 <tr><td>Philips (Ljubljana)</td><td>50</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
 <tr><td>Esaote (Milan)</td><td>47</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
 </table>
-<p class="note">Le masquage est validé par revue visuelle d'un échantillon par appareil, jointe ci-dessous
-une fois produite. Un taux d'échec non nul doit être reporté, pas corrigé silencieusement.</p>
+<p class="note">Le nettoyage est validé par revue visuelle d'un échantillon par appareil. Un taux
+d'échec non nul doit être reporté, pas corrigé silencieusement.</p>
 
-<div class="placeholder">Planche de contrôle visuel des ROI — à produire à l'Étape 1</div>
+<div class="placeholder">Planche de contrôle visuel des régions extraites, par appareil — à produire à l'étape 1.1</div>
 
-<h3>Descripteurs de texture — séparabilité brute</h3>
-<p>Avant tout apprentissage profond : les descripteurs GLCM et LBP séparent-ils déjà les grades ?
-Cette mesure dit si le feature engineering porte du signal par lui-même.</p>
-<table>
-<tr><th>Descripteur</th><th>Grade 0</th><th>Grade 1</th><th>Grade 2</th><th>Grade 3</th><th>p (Kruskal-Wallis)</th></tr>
-<tr><td>GLCM — contraste</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>GLCM — homogénéité</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>GLCM — entropie</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>LBP — uniformité</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>Densité de coins Harris</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-</table>
-
-<!-- ══════════════ ÉTAPE 2 ══════════════ -->
-<h2>Étape 2 — Classification des grades</h2>
+<!-- ══════════════ ÉTAPE 1.2–1.3 ══════════════ -->
+<h2>Étapes 1.2 et 1.3 — Classification boîte noire</h2>
 <p class="byline"><span class="pill pending">en attente</span></p>
 
 <h3>Tâche principale — multiclasse, 4 grades De Vita</h3>
-<p>Validation croisée <em>k</em>-fold groupée par patient. Moyenne ± écart-type inter-plis,
-intervalles de confiance bootstrap à 95 %.</p>
+<p>Entrée : <strong>image seule</strong>. Validation croisée <em>k</em>-fold groupée par patient.
+Moyenne ± écart-type inter-plis, intervalles de confiance bootstrap à 95 %.</p>
 <table>
-<tr><th>Modèle</th><th>Entrée</th><th>F1 macro [IC 95 %]</th><th>Accuracy</th><th>AUC (OvR)</th><th>run_id</th></tr>
-<tr><td>CNN from scratch</td><td>image seule</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>CNN from scratch</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>ResNet18</td><td>image seule</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>ResNet18</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>ResNet50</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>ViT</td><td>image + texture</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td><em>Trivial — toujours grade 0</em></td><td>—</td><td>0,164</td><td>0,489</td><td>0,500</td><td>analytique</td></tr>
+<tr><th>Modèle</th><th>F1 macro [IC 95 %]</th><th>Accuracy</th><th>AUC (OvR)</th><th>Graines</th><th>run_id</th></tr>
+<tr><td>CNN from scratch</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet18</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet50</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ViT</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td><em>Trivial — toujours grade 0</em></td><td>0,164</td><td>0,489</td><td>0,500</td><td>—</td><td>analytique</td></tr>
 </table>
-<p class="note">La comparaison « image seule » contre « image + texture » sur une même architecture est
-la mesure directe de l'apport du feature engineering — première contribution revendiquée du projet.</p>
 
 <h3>Performance par grade — le détail qui compte</h3>
 <table>
@@ -197,7 +185,7 @@ la mesure directe de l'apport du feature engineering — première contribution 
 effondrée sur ce grade, malgré un F1 macro correct, doit être reportée explicitement et non noyée
 dans la moyenne.</p>
 
-<div class="placeholder">Matrice de confusion 4 × 4 — à produire à l'Étape 2</div>
+<div class="placeholder">Matrice de confusion 4 × 4 — à produire à l'étape 1.3</div>
 
 <h3>Tâche complémentaire — binaire, sain vs atteint</h3>
 <p>Regroupement des grades 1-2-3. Étude secondaire, pour situer la difficulté relative des deux tâches.</p>
@@ -221,45 +209,70 @@ que le modèle ait appris la signature de l'échographe plutôt que la pathologi
 le symptôme attendu de la confusion centre/appareil. Cet écart est un résultat en soi, à reporter
 qu'il soit favorable ou non.</p>
 
-<!-- ══════════════ ÉTAPE 3 ══════════════ -->
-<h2>Étape 3 — Explicabilité</h2>
+<!-- ══════════════ ÉTAPE 1.4 ══════════════ -->
+<h2>Étape 1.4 — Explication post-hoc</h2>
 <p class="byline"><span class="pill pending">en attente</span></p>
 
-<h3>Focus anatomique — recouvrement explication ∩ ROI</h3>
-<p>Fraction ρ de la saillance totale qui tombe à l'intérieur du masque glandulaire.
+<h3>Focus anatomique — recouvrement explication ∩ région glandulaire</h3>
+<p>Fraction ρ de la saillance totale qui tombe à l'intérieur de la région glandulaire.
 ρ proche de 1 : le modèle regarde la glande. ρ faible : il s'appuie sur autre chose.</p>
+<p class="note">La région glandulaire de référence provient des modèles de segmentation pré-entraînés
+publiés avec le corpus HarmonicSS, employés <strong>uniquement comme instrument de mesure</strong> :
+ce masque n'entre jamais dans l'image fournie au réseau, qui reste une boîte noire nourrie de l'image
+seule.</p>
 <table>
 <tr><th>Modèle</th><th>Prétraitement</th><th>ρ — SHAP</th><th>ρ — LIME</th><th>Concordance SHAP/LIME</th><th>run_id</th></tr>
-<tr><td>ResNet18</td><td>sans masquage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>ResNet18</td><td>avec masquage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>ViT</td><td>avec masquage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet18</td><td>sans nettoyage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ResNet18</td><td>avec nettoyage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
+<tr><td>ViT</td><td>avec nettoyage</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
 </table>
-<p class="note">La comparaison « sans masquage » contre « avec masquage » quantifie l'effet de la
-troisième contribution du projet. Si ρ ne progresse pas, le masquage n'a pas rempli son rôle et
-doit être révisé — c'est le sens de la boucle de contrôle décrite dans les travaux de recherche.</p>
+<p class="note">La comparaison « sans nettoyage » contre « avec nettoyage » quantifie l'effet de
+l'hygiène des données sur ce que le modèle regarde. Si ρ ne progresse pas, le nettoyage n'a pas
+rempli son rôle et doit être révisé avant toute interprétation.</p>
 
-<div class="placeholder">Heatmaps SHAP et LIME superposées, par grade — à produire à l'Étape 3</div>
-
-<!-- ══════════════ ÉTAPE 4 ══════════════ -->
-<h2>Étape 4 — Alignement vision-langage (CLIP)</h2>
-<p class="byline"><span class="pill pending">en attente</span></p>
-
-<h3>Classification zero-shot par similarité cosinus</h3>
-<p>Aucun entraînement : chaque image est assignée au grade dont la description clinique a
-l'<em>embedding</em> le plus proche.</p>
+<h3>Stabilité des explications</h3>
+<p>Une carte de saillance qui change selon la graine ou le réglage ne dit rien de fiable sur le modèle.
+Cette mesure conditionne l'interprétabilité de toute la section précédente.</p>
 <table>
-<tr><th>Modèle CLIP</th><th>Jeu de prompts</th><th>F1 macro</th><th>Accuracy</th><th>run_id</th></tr>
-<tr><td>CLIP ViT-B/16 (openai)</td><td>lexique v1</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td>CLIP ViT-B/16 (openai)</td><td>lexique v2</td><td class="na">—</td><td class="na">—</td><td class="na">—</td></tr>
-<tr><td><em>Trivial — toujours grade 0</em></td><td>—</td><td>0,164</td><td>0,489</td><td>analytique</td></tr>
+<tr><th>Source de variation</th><th>Méthode affectée</th><th>Corrélation entre cartes</th><th>Verdict</th></tr>
+<tr><td>Graine aléatoire</td><td>SHAP et LIME</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Nombre / taille des superpixels</td><td>LIME</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Choix des données de référence</td><td>SHAP</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Petites perturbations d'entrée</td><td>SHAP et LIME</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
 </table>
 
-<div class="callout">
-  <div class="ct">⚠ Attente déclarée avant mesure</div>
-  CLIP n'a pas vu d'échographies pendant son pré-entraînement. Un résultat zero-shot proche du
-  classifieur trivial est une <strong>issue anticipée</strong> et sera reporté comme telle : elle
-  motiverait le recours à une variante biomédicale ou à un ajustement léger, et non une reformulation
-  après coup de ce qui était attendu. Cette phrase est écrite <em>avant</em> la première mesure.
+<h3>Explication des erreurs</h3>
+<p>Les cartes des cas mal classés sont analysées au même titre que celles des cas corrects.
+C'est souvent là que se lit le mécanisme réel de la décision.</p>
+<table>
+<tr><th>Grade réel</th><th>Grade prédit</th><th>Cas concernés</th><th>ρ moyen</th><th>Région saillante dominante</th></tr>
+<tr><td colspan="5" style="text-align:center;color:var(--muted)">À renseigner une fois la matrice de confusion disponible.</td></tr>
+</table>
+
+<div class="placeholder">Heatmaps SHAP et LIME superposées, par grade et pour les erreurs — à produire à l'étape 1.4</div>
+
+<!-- ══════════════ ÉTAPE 1.5 ══════════════ -->
+<h2>Étape 1.5 — Analyse et interprétation</h2>
+<p class="byline"><span class="pill pending">en attente</span></p>
+<p>Les cinq questions auxquelles la phase 1 doit répondre. Les réponses seront rédigées ici et dans
+la section correspondante des <a href="research_works.html#e15">travaux de recherche</a>, en s'appuyant
+exclusivement sur les tableaux ci-dessus.</p>
+
+<table>
+<tr><th>#</th><th>Question</th><th>Réponse</th></tr>
+<tr><td>1</td><td>Sur quoi le modèle s'appuie-t-il réellement ?</td><td class="na">—</td></tr>
+<tr><td>2</td><td>Où échoue-t-il ?</td><td class="na">—</td></tr>
+<tr><td>3</td><td>A-t-il appris l'appareil plutôt que la pathologie ?</td><td class="na">—</td></tr>
+<tr><td>4</td><td>Les explications sont-elles fiables ?</td><td class="na">—</td></tr>
+<tr><td>5</td><td>Que l'approche boîte noire ne peut-elle pas apporter ?</td><td class="na">—</td></tr>
+</table>
+
+<div class="callout warn">
+  <div class="ct">⚠ Une carte de saillance n'est pas une explication causale</div>
+  SHAP et LIME indiquent quelles régions <strong>influencent la sortie du modèle</strong> — pas quelles
+  régions <em>causent</em> la maladie, ni sur quoi un clinicien devrait fonder son diagnostic. Cette
+  distinction sera tenue explicitement dans la rédaction des réponses ci-dessus. Écrit
+  <em>avant</em> la première mesure.
 </div>
 
 <!-- ══════════════ LIMITES ══════════════ -->
@@ -270,17 +283,20 @@ l'<em>embedding</em> le plus proche.</p>
   de F1 sans test statistique approprié.</li>
   <li><strong>Identité patient reconstituée, non fournie</strong> — le regroupement s'appuie sur
   centre + sexe + âge + durée de maladie. Deux patients d'un même centre partageant ces quatre valeurs
-  seraient fusionnés à tort. Le nombre de patients reconstitués sera reporté à l'Étape 1 pour que cette
-  approximation reste visible.</li>
+  seraient fusionnés à tort. Le nombre de patients reconstitués sera reporté à l'étape 1.1 pour que
+  cette approximation reste visible.</li>
   <li><strong>Confusion centre/appareil non éliminable</strong> — chaque centre n'ayant qu'un appareil,
   aucune analyse ne peut séparer l'effet du site de celui du constructeur. Le leave-one-center-out
   mesure leur effet combiné, pas chacun séparément.</li>
   <li><strong>Cible ordinale traitée comme catégorielle</strong> — la perte standard pénalise
-  identiquement une confusion 0↔1 et 0↔3. Une variante ordinale est identifiée comme piste, à évaluer
-  après établissement de la baseline catégorielle.</li>
-  <li><strong>Prochaine étape</strong> — Étape 1 : reconstitution de l'identité patient, découpage
-  groupé, masquage de la ROI, extraction des descripteurs. Les premiers chiffres attendus sur cette page
-  sont les contrôles d'intégrité du découpage.</li>
+  identiquement une confusion 0↔1 et 0↔3. La phase 1 assume ce choix pour rester une baseline lisible ;
+  la conséquence sera mesurée par la matrice de confusion et consignée, sans correction en cours de route.</li>
+  <li><strong>Limites intrinsèques des méthodes d'explication</strong> — SHAP dépend du choix des données
+  de référence, LIME de la segmentation en superpixels. Les mesures de stabilité de l'étape 1.4 sont là
+  pour borner ce que ces méthodes permettent d'affirmer.</li>
+  <li><strong>Prochaine étape</strong> — étape 1.1 : reconstitution de l'identité patient, découpage
+  groupé, nettoyage des artefacts. Les premiers chiffres attendus sur cette page sont les contrôles
+  d'intégrité du découpage.</li>
 </ul>
 
 <!-- ══════════════ JOURNAL DES RUNS ══════════════ -->
@@ -296,7 +312,7 @@ l'<em>embedding</em> le plus proche.</p>
   Méthodologie, justification des choix et suivi des étapes :
   <a href="research_works.html">Travaux de recherche</a> · plan de travail : <code>Plan.md</code>.
   Les valeurs marquées « analytique » sont calculées directement depuis la distribution du corpus,
-  sans apprentissage. Page mise à jour à chaque avancement du projet.
+  sans apprentissage. Périmètre : phase 1 uniquement. Page mise à jour à chaque avancement du projet.
 </footer>
 
 <script>
