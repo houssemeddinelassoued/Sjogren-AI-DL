@@ -71,6 +71,27 @@ em{color:var(--warn); font-style:normal}
 .card .k{font-size:1.5rem; font-weight:700; color:var(--accent)}
 .card .t{font-weight:600; margin-bottom:.35rem; color:var(--strong)}
 .card .d{font-size:.84rem; color:var(--muted)}
+.card-media{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1.1rem}
+.card-media .card-text{flex:1 1 170px; min-width:150px}
+.thumb-stack{display:flex; flex:0 0 auto; height:56px; padding-right:16px}
+.thumb-stack .thumb{
+  position:relative; width:40px; height:40px; object-fit:cover; border-radius:7px;
+  border:2px solid var(--panel); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:zoom-in;
+  margin-left:-16px; transition:transform .15s ease, box-shadow .15s ease, z-index 0s;
+}
+.thumb-stack .thumb:first-child{margin-left:0}
+.thumb-stack .thumb:nth-child(odd){transform:rotate(-6deg)}
+.thumb-stack .thumb:nth-child(even){transform:rotate(5deg)}
+.thumb-stack .thumb:hover{transform:rotate(0deg) translateY(-8px) scale(1.4); z-index:9; box-shadow:0 8px 16px rgba(0,0,0,.45)}
+.img-modal{position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(5,7,12,.82); padding:2rem}
+.img-modal.open{display:flex}
+.img-modal img{max-width:min(90vw,720px); max-height:82vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.55); border:1px solid var(--border)}
+.img-modal-cap{position:absolute; bottom:1.3rem; left:0; right:0; text-align:center; color:var(--text); font-size:.85rem}
+.img-modal-close{
+  position:absolute; top:1rem; right:1.2rem; width:36px; height:36px; border-radius:50%;
+  background:var(--panel2); border:1px solid var(--border); color:var(--text); font-size:1.05rem;
+  cursor:pointer; line-height:1;
+}
 .badge{display:inline-block; font-size:.7rem; padding:.15rem .55rem; border-radius:999px; border:1px solid var(--border); color:var(--muted); margin-right:.35rem}
 .badge.ok{color:var(--ok); border-color:var(--ok)}
 .badge.todo{color:var(--warn); border-color:var(--warn)}
@@ -163,6 +184,10 @@ footer{color:var(--muted); font-size:.78rem; border-top:1px solid var(--border);
   table{display:block; overflow-x:auto}
   .lab{padding:1rem}
   .theme-toggle{top:.5rem; right:.5rem}
+  .thumb-stack .thumb:nth-child(n+7){display:none}
+}
+@media(max-width:480px){
+  .thumb-stack .thumb:nth-child(n+4){display:none}
 }
 </style>
 <script>
@@ -172,6 +197,11 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 </head>
 <body>
 <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème clair" title="Activer le thème clair">☀</button>
+<div class="img-modal" id="imgModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <button class="img-modal-close" id="imgModalClose" type="button" aria-label="Fermer">✕</button>
+  <img id="imgModalPic" src="" alt="">
+  <div class="img-modal-cap" id="imgModalCap"></div>
+</div>
 <div style="background:#0e1620;color:#5eead4;padding:.6rem 1.2rem;font-size:.85rem;text-align:center;font-family:sans-serif;border-bottom:1px solid #1f293d">
   Travaux de recherche réalisés par <strong style="color:#fff">Houssem Eddine Lassoued</strong>, encadré par <strong style="color:#fff">Dr. Anis Ben Aicha</strong> et <strong style="color:#fff">Pr. Habib Fathallah</strong>
   </br>
@@ -306,9 +336,21 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
   présent dans <code>HarmonicSS benchmark dataset/</code>.</p>
 
   <div class="cards">
-    <div class="card"><div class="k">225</div><div class="t">images</div>
-      <div class="d">JPG, <code>001.jpg</code> … <code>225.jpg</code>, indexées par la colonne
-      <code>Anonymized ID</code> du CSV (séparateur <code>;</code>).</div></div>
+    <div class="card card-media">
+      <div class="card-text"><div class="k">225</div><div class="t">images</div>
+        <div class="d">JPG, <code>001.jpg</code> … <code>225.jpg</code>, indexées par la colonne
+        <code>Anonymized ID</code> du CSV (séparateur <code>;</code>).</div></div>
+      <div class="thumb-stack" id="thumbStack">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/001.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/001.jpg" alt="SGUS 001 — Udine, grade De Vita 3">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/009.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/009.jpg" alt="SGUS 009 — Udine, grade De Vita 2">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/076.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/076.jpg" alt="SGUS 076 — Ljubljana, grade De Vita 2">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/100.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/100.jpg" alt="SGUS 100 — Ljubljana, grade De Vita 0">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/127.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/127.jpg" alt="SGUS 127 — Milano, grade De Vita 3">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/150.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/150.jpg" alt="SGUS 150 — Milano, grade De Vita 0">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/174.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/174.jpg" alt="SGUS 174 — Belgrade, grade De Vita 1">
+        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/200.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/200.jpg" alt="SGUS 200 — Belgrade, grade De Vita 0">
+      </div>
+    </div>
     <div class="card"><div class="k">4</div><div class="t">grades cibles</div>
       <div class="d">Score De Vita 0-3, plus le score OMERACT en annotation secondaire.</div></div>
     <div class="card"><div class="k">4</div><div class="t">centres · 4 appareils</div>
@@ -1192,6 +1234,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const $ = id => document.getElementById(id);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  /* ── pile de miniatures du dataset → popup agrandie ── */
+  const imgModal = $('imgModal');
+  const imgModalPic = $('imgModalPic');
+  const imgModalCap = $('imgModalCap');
+  const openImgModal = (src, caption) => {
+    imgModalPic.src = src;
+    imgModalPic.alt = caption || '';
+    imgModalCap.textContent = caption || '';
+    imgModal.classList.add('open');
+    imgModal.setAttribute('aria-hidden', 'false');
+  };
+  const closeImgModal = () => {
+    imgModal.classList.remove('open');
+    imgModal.setAttribute('aria-hidden', 'true');
+    imgModalPic.src = '';
+  };
+  document.querySelectorAll('.thumb-stack .thumb').forEach(img => {
+    img.addEventListener('click', () => openImgModal(img.dataset.full, img.alt));
+  });
+  imgModal.addEventListener('click', e => { if (e.target === imgModal) closeImgModal(); });
+  $('imgModalClose').addEventListener('click', closeImgModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImgModal(); });
 
   /* ══════════ Distributions réelles du corpus ══════════ */
   // Effectifs mesurés sur "Anonymized images - Info.csv" (225 lignes).
