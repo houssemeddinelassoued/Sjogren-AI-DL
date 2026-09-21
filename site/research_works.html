@@ -98,6 +98,7 @@ td code, p code, li code{background:var(--code); padding:.1rem .4rem; border-rad
 pre{background:var(--code); border:1px solid var(--border); border-radius:10px; padding:1rem 1.2rem; overflow-x:auto; margin:.8rem 0; font-size:.8rem; line-height:1.55}
 pre code{font-family:var(--mono); color:#c9d1d9; background:none; padding:0}
 .cm{color:#7d8799}
+.sm{font-size:.82em; color:var(--muted)}
 .kw{color:#ff7b72}
 .fn{color:#d2a8ff}
 .st{color:#a5d6ff}
@@ -452,12 +453,14 @@ flowchart LR
   <div class="fig-cap">Fig. 3 — Chaîne de la phase 1. L'analyse (en rouge) conditionne l'ouverture de la phase 2.</div>
   </div>
 
-  <h3>Arborescence de code prévue</h3>
-  <p><span class="badge todo">squelette créé, aucune logique encore écrite</span> — arborescence en place dans <code>sjogren/</code>, modules à implémenter au fil des étapes.</p>
-  <pre><code><span class="cm"># structure prévue — phase 1 uniquement</span>
+  <h3>Arborescence de code</h3>
+  <p><span class="badge wip">implémentation en cours</span> — arborescence en place dans <code>sjogren/</code>,
+  modules implémentés au fil des étapes. Un module marqué <span class="badge ok">fait</span> est écrit,
+  exécutable et vérifié ; les autres restent des fichiers de réservation.</p>
+  <pre><code><span class="cm"># structure — phase 1 uniquement</span>
 sjogren/
 ├── data/
-│   ├── metadata.py      <span class="cm"># lecture CSV, reconstitution de l'identité patient</span>
+│   ├── metadata.py      <span class="cm"># FAIT — lecture CSV, identité patient, audit des collisions</span>
 │   ├── splits.py        <span class="cm"># découpage groupé par patient, k-fold, leave-one-center-out</span>
 │   ├── preprocess.py    <span class="cm"># nettoyage des artefacts, normalisation d'intensité</span>
 │   └── dataset.py       <span class="cm"># SjogrenDataset (image seule)</span>
@@ -472,13 +475,17 @@ sjogren/
     ├── shap_maps.py     <span class="cm"># attributions SHAP</span>
     ├── lime_maps.py     <span class="cm"># superpixels LIME</span>
     ├── overlap.py       <span class="cm"># recouvrement ρ, concordance SHAP/LIME</span>
-    └── stability.py     <span class="cm"># sensibilité aux graines et aux perturbations</span></code></pre>
+    └── stability.py     <span class="cm"># sensibilité aux graines et aux perturbations</span>
+
+tests/
+├── test_metadata.py     <span class="cm"># FAIT — intégrité du corpus, identité patient, collisions</span>
+└── test_splits.py       <span class="cm"># aucun patient partagé entre plis, 4 grades par pli</span></code></pre>
 </section>
 
 <!-- ══════════════════ 5. ÉTAPE 1.1 ══════════════════ -->
 <section id="e11">
   <h2>5 · Étape 1.1 — Pipeline de données et garanties d'intégrité</h2>
-  <p class="byline"><span class="badge todo">à faire</span> <span class="badge core">étape courante</span></p>
+  <p class="byline"><span class="badge wip">en cours</span> <span class="badge core">étape courante</span> — 2 livrables sur 6 achevés</p>
 
   <p><strong>Objectif</strong> — produire un <code>DataLoader</code> dont on peut <em>démontrer</em>
   qu'il ne fuit pas et qu'il ne présente au modèle que du tissu.</p>
@@ -513,15 +520,124 @@ flowchart TB
     entre plis est vérifiée <em>par un test automatique</em>, et non par une relecture du code.</p>
   </div>
 
+  <div class="callout warn">
+    <div class="ct">⚠ Correction du 2026-09-21 — « deux images par patient » est inexact</div>
+    <p>L'encadré ci-dessus affirmait deux images par patient. La mise en œuvre de
+    <code>data/metadata.py</code> mesure <strong>2,53 images par groupe en moyenne</strong>, avec des
+    groupes de 1 à 8 images. L'affirmation est conservée telle quelle pour la trace, mais elle ne
+    décrit pas le corpus. Le raisonnement sur la fuite, lui, reste entièrement valide — il est même
+    renforcé : plus un patient contribue d'images, plus la fuite serait sévère.</p>
+    <p>Deux causes distinctes se superposent et ne sont pas démêlables à partir du CSV seul :
+    une <strong>acquisition bilatérale</strong> (jusqu'à quatre images légitimes pour un patient :
+    parotide et sous-mandibulaire, droite et gauche) et une <strong>fusion de patients distincts</strong>
+    partageant la même signature démographique. Le détail est donné plus bas.</p>
+  </div>
+
+  <h3>Reconstitution de l'identité patient — ce que la mesure a établi</h3>
+  <p>Le CSV ne fournit aucun identifiant patient : l'<code>Anonymized ID</code> identifie une
+  <em>image</em>. L'identité est donc reconstituée par la signature
+  <code>centre + sexe + âge + durée de maladie</code>. Résultat mesuré sur les 225 images :</p>
+
+  <table>
+    <tr><th>Grandeur</th><th>Valeur</th><th>Nature</th></tr>
+    <tr><td>Images</td><td>225</td><td><span class="badge ok">analytique</span></td></tr>
+    <tr><td><strong>Patients reconstitués</strong></td><td><strong>89</strong></td><td><span class="badge ok">analytique</span></td></tr>
+    <tr><td>Images par patient</td><td>2,53 en moyenne — de 1 à 8</td><td><span class="badge ok">analytique</span></td></tr>
+    <tr><td>Groupes portant un indice de fusion</td><td>12 sur 89</td><td><span class="badge ok">analytique</span></td></tr>
+  </table>
+
+  <div class="explain">
+    <div class="ct">🎓 Pourquoi une reconstitution volontairement <em>trop grossière</em></div>
+    <p>Les deux erreurs possibles n'ont pas le même coût. <strong>Sur-regrouper</strong> — fusionner deux
+    patients distincts — réduit le nombre de groupes indépendants : moins de puissance statistique,
+    stratification par grade plus difficile, plis plus déséquilibrés. <strong>Sous-regrouper</strong> —
+    scinder un patient réel entre deux plis — crée la fuite silencieuse décrite plus haut et invalide
+    toutes les métriques en aval.</p>
+    <p>La signature démographique ne peut se tromper que dans un sens : deux images d'un même patient
+    partagent nécessairement centre, sexe, âge et durée, donc elles atterrissent toujours dans le même
+    groupe. La clé <em>fusionne</em>, elle ne <em>scinde</em> jamais. C'est la raison pour laquelle elle
+    est conservée telle quelle malgré ses collisions : elle se trompe du côté sûr. Le prix payé est
+    mesuré et reporté, il n'est pas dissimulé.</p>
+    <p>Corollaire pour l'interprétation des résultats : les 89 groupes sont une <strong>borne
+    inférieure</strong> du nombre réel de patients. Les intervalles de confiance calculés par
+    rééchantillonnage sur ces groupes seront donc plutôt <em>conservateurs</em> — ce qui est l'erreur
+    acceptable.</p>
+  </div>
+
+  <h3>Collisions d'identité recensées</h3>
+  <p>Trois indices indépendants de fusion sont recherchés automatiquement par
+  <code>audit_patient_identity()</code> et signalés à chaque chargement des métadonnées :</p>
+
+  <table>
+    <tr><th>Indice</th><th>Critère</th><th>Groupes concernés</th><th>Force de l'indice</th></tr>
+    <tr><td>Taille au-delà du plausible</td><td>plus de 4 images (2 glandes × 2 côtés)</td><td>3 — dont un groupe de 8 et deux de 6</td><td>forte</td></tr>
+    <tr><td>Glande en surnombre</td><td>plus de 2 images d'un même type de glande</td><td>6</td><td>forte — un patient n'a que deux parotides</td></tr>
+    <tr><td>Identifiants non contigus</td><td><code>Anonymized ID</code> éloignés dans la numérotation</td><td>9</td><td><em>heuristique</em> — repose sur une régularité observée de la numérotation, non documentée</td></tr>
+  </table>
+
+  <div class="callout danger">
+    <div class="ct">⛔ Clé dégénérée à Ljubljana</div>
+    La colonne <code>disease duration</code> vaut <strong>0 pour les 50 images de Ljubljana</strong>.
+    La signature y perd une de ses quatre dimensions et se réduit à
+    <code>centre + sexe + âge</code> : le sur-regroupement y est mécaniquement plus fort qu'ailleurs.
+    Conséquence à retenir au moment du <em>leave-one-center-out</em> : le pli Ljubljana n'a pas la même
+    granularité de groupement que les trois autres, et un écart de performance sur ce centre ne peut
+    pas être attribué au seul appareil Philips.
+  </div>
+
+  <div class="callout">
+    <div class="ct">📋 Anomalie de contenu conservée telle quelle</div>
+    Une ligne porte la valeur <code>2</code> dans <em>fulfillment of 2016 ACR-EULAR classification
+    criteria</em>, dont le domaine attendu est <code>{0, 1}</code>. Signalée à chaque chargement, elle
+    n'est ni corrigée ni écartée : cette colonne n'intervient ni comme cible ni comme entrée, et une
+    correction arbitraire serait une réécriture de la source.
+  </div>
+
   <h3>Livrables de l'étape</h3>
   <table>
     <tr><th>Livrable</th><th>Module prévu</th><th>Statut</th></tr>
-    <tr><td>Lecture du CSV et reconstitution de l'identité patient</td><td><code>data/metadata.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Lecture du CSV et reconstitution de l'identité patient<br><span class="sm">+ audit des collisions d'identité, validation des domaines de valeurs, inspection en ligne de commande</span></td><td><code>data/metadata.py</code></td><td><span class="badge ok">fait</span><br><span class="sm">2026-09-21</span></td></tr>
     <tr><td>Découpage groupé par patient, stratifié par grade</td><td><code>data/splits.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td>Nettoyage des artefacts et normalisation d'intensité</td><td><code>data/preprocess.py</code></td><td><span class="badge todo">à faire</span></td></tr>
     <tr><td><code>SjogrenDataset</code> et augmentations</td><td><code>data/dataset.py</code></td><td><span class="badge todo">à faire</span></td></tr>
+    <tr><td>Tests d'intégrité des métadonnées<br><span class="sm">corpus, déterminisme de l'identité, détection des collisions, typage, anomalies de domaine</span></td><td><code>tests/test_metadata.py</code></td><td><span class="badge ok">fait</span><br><span class="sm">2026-09-21 — 23/23</span></td></tr>
     <tr><td>Tests d'intégrité du découpage</td><td><code>tests/test_splits.py</code></td><td><span class="badge todo">à faire</span></td></tr>
   </table>
+
+  <p class="sm">La ligne <code>tests/test_metadata.py</code> a été <strong>ajoutée</strong> au tableau :
+  le plan initial ne prévoyait de tests que pour le découpage, mais les garanties portées par les
+  métadonnées (déterminisme de l'identité patient, absence d'image perdue, préservation du typage
+  entier) se violent silencieusement et méritent le même verrouillage automatique.</p>
+
+  <div class="callout">
+    <div class="ct">🧪 Ce que la suite de tests verrouille — et pourquoi ces invariants-là</div>
+    <p>Les six invariants retenus partagent une propriété : <strong>leur violation ne lève aucune
+    exception</strong>. Elle produit des chiffres plausibles et faux.</p>
+    <table>
+      <tr><th>Invariant</th><th>Panne silencieuse évitée</th></tr>
+      <tr><td>225 lignes, distribution 110/28/55/32</td><td>un corpus modifié en amont invaliderait la pondération de la perte et la stratification, calibrées sur cette distribution</td></tr>
+      <tr><td>Aucune image perdue, aucune orpheline</td><td>un échantillon fantôme ne planterait qu'au premier passage du <code>DataLoader</code>, après des heures d'entraînement</td></tr>
+      <tr><td>Déterminisme de <code>patient_id</code></td><td>des identifiants instables donneraient des plis différents à graine identique : résultats irreproductibles sans message d'erreur</td></tr>
+      <tr><td>Une même signature ne se scinde jamais</td><td>c'est la propriété qui empêche la fuite ; sa perte est exactement le scénario que l'étape 1.1 existe pour prévenir</td></tr>
+      <tr><td>Détection des trois indices de collision</td><td>un auditeur devenu muet laisserait croire à un corpus propre ; un cas de contrôle négatif vérifie aussi qu'il ne signale pas tout</td></tr>
+      <tr><td>Typage <code>Int64</code> <em>nullable</em></td><td>en entier classique, une cellule vide promeut la colonne en flottant et <code>devita</code> passe de <code>3</code> à <code>3.0</code> — comparaisons d'étiquettes et matrices de confusion faussées sans erreur</td></tr>
+    </table>
+    <p>Un septième test verrouille l'accord entre le code et les pages de suivi : 89 patients,
+    12 groupes suspects, F1 macro trivial de 0,164. S'il casse, ce sont les pages qu'il faut corriger,
+    pas le test qu'il faut assouplir.</p>
+  </div>
+
+  <div class="callout warn">
+    <div class="ct">⚙ Outillage — pas de dépendance de test ajoutée</div>
+    <code>pytest</code> ne figure pas dans la pile déclarée de la phase 1 et n'est pas installé dans
+    l'environnement. Le fichier respecte les conventions pytest (fonctions <code>test_*</code>,
+    <code>assert</code> nu) <em>et</em> embarque un exécuteur de repli :
+    <code>python tests/test_metadata.py</code> fonctionne aujourd'hui sans rien installer, et
+    <code>pytest tests/</code> ramassera le même fichier le jour où l'outil sera adopté. L'ajout d'une
+    dépendance d'outillage reste une décision à arbitrer séparément.
+    Les sept tests qui dépendent du corpus réel se <em>sautent</em> proprement s'il est absent ; les
+    seize autres tournent sur des corpus factices.
+  </div>
 
   <div class="callout">
     <div class="ct">✔ Critère de sortie de l'étape</div>
@@ -806,8 +922,10 @@ flowchart LR
       identification des trois contraintes structurelles · protocole d'évaluation fixé ·
       documents de suivi et de résultats.</div></div>
     <div class="card"><div class="t">🚧 Étape courante</div>
-      <div class="d"><strong>Étape 1.1</strong> — reconstitution de l'identité patient, découpage groupé,
-      nettoyage des artefacts, <code>SjogrenDataset</code>, tests d'intégrité.</div></div>
+      <div class="d"><strong>Étape 1.1</strong> — <code>data/metadata.py</code> écrit et exécuté
+      (89 patients reconstitués, collisions auditées), verrouillé par <code>tests/test_metadata.py</code>
+      (23 tests, tous passants). Restent le découpage groupé, le nettoyage des artefacts,
+      <code>SjogrenDataset</code> et les tests du découpage.</div></div>
     <div class="card"><div class="t">🔭 Horizon</div>
       <div class="d">Étapes 1.2 à 1.5, puis définition du périmètre de la phase 2 avec l'encadrant,
       à partir des limites établies.</div></div>
@@ -904,6 +1022,57 @@ flowchart LR
       <td>Les développements relatifs à l'alignement vision-langage et à l'architecture RAG sont retirés
       des documents de suivi et de résultats : ils ne font l'objet d'aucun engagement. Ils figurent
       désormais comme pistes non arrêtées de la phase 2.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-21</code></td>
+      <td><strong>Étape 1.1 — <code>data/metadata.py</code> implémenté</strong></td>
+      <td>Première brique de code du projet. Lecture du CSV, normalisation des en-têtes, contrôle des
+      domaines de valeurs, reconstitution de l'identité patient et audit des collisions. Le module est
+      déclaré seule porte d'entrée vers les métadonnées : aucun autre module ne relit le CSV.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-21</code></td>
+      <td>Décision — reconstitution d'identité <strong>conservatrice</strong>, collisions auditées
+      plutôt que résolues</td>
+      <td>La signature <code>centre + sexe + âge + durée</code> est conservée telle quelle malgré ses
+      collisions, parce qu'elle ne peut que fusionner des patients distincts, jamais scinder un patient
+      réel : elle se trompe du côté qui ne crée pas de fuite. Aucune heuristique de dé-fusion n'est
+      appliquée — elle risquerait de scinder un patient réel, soit exactement l'erreur que le découpage
+      groupé cherche à empêcher. Les 89 groupes sont donc une borne inférieure du nombre de patients, et
+      les intervalles de confiance qui en découleront seront conservateurs.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-21</code></td>
+      <td>Constat — « deux images par patient » invalidé par la mesure</td>
+      <td>2,53 images par groupe en moyenne, de 1 à 8. 12 groupes sur 89 portent un indice de fusion.
+      L'affirmation antérieure est conservée dans le document, assortie d'un avertissement daté.
+      Le raisonnement sur la fuite n'est pas affaibli, il est renforcé.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-21</code></td>
+      <td><strong>Étape 1.1 — <code>tests/test_metadata.py</code> implémenté</strong></td>
+      <td>23 tests, tous passants. Verrouillent les invariants dont la violation serait silencieuse :
+      intégrité du corpus, déterminisme de l'identité patient, non-scission d'une signature, détection
+      des trois indices de collision (avec cas de contrôle négatif), typage entier <em>nullable</em>,
+      signalement non bloquant des anomalies de domaine. Un test supplémentaire verrouille l'accord
+      entre le code et les chiffres publiés dans les documents de suivi.
+      <strong>Ligne ajoutée au tableau des livrables</strong> de l'étape, qui ne prévoyait de tests que
+      pour le découpage.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-21</code></td>
+      <td>Décision — aucune dépendance de test ajoutée</td>
+      <td><code>pytest</code> n'est pas dans la pile déclarée de la phase 1 et n'est pas installé.
+      Les tests suivent ses conventions mais embarquent un exécuteur de repli, de sorte qu'ils soient
+      vérifiables immédiatement sans arbitrage d'outillage. Les tests dépendant du corpus réel se
+      sautent proprement s'il est absent.</td>
+    </tr>
+    <tr>
+      <td><code>2026-09-21</code></td>
+      <td>Constat — <code>disease duration</code> constante à Ljubljana</td>
+      <td>Valeur 0 pour les 50 images du centre : la signature d'identité y perd une dimension. À
+      prendre en compte dans l'interprétation du <em>leave-one-center-out</em> — le pli Ljubljana n'a
+      pas la même granularité de groupement que les autres.</td>
     </tr>
   </table>
 

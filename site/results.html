@@ -86,12 +86,14 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 </header>
 
 <div class="callout warn">
-  <div class="ct"><span class="pill pending">aucune mesure</span> État de cette page</div>
-  Aucun modèle n'a encore été entraîné. Les tableaux ci-dessous sont la structure d'accueil des résultats :
-  les colonnes, les métriques et les conditions d'évaluation sont fixées <strong>avant</strong> la première
-  mesure, précisément pour ne pas pouvoir être ajustées après coup en fonction de ce qui sortira.
-  Les seules valeurs chiffrées présentes à ce stade sont <strong>analytiques</strong> — calculées
-  directement depuis la distribution du corpus, sans aucun apprentissage.
+  <div class="ct"><span class="pill pending">aucune mesure de performance</span> État de cette page</div>
+  Aucun modèle n'a encore été entraîné. Les tableaux des étapes 1.2 à 1.5 sont la structure d'accueil des
+  résultats : les colonnes, les métriques et les conditions d'évaluation sont fixées <strong>avant</strong>
+  la première mesure, précisément pour ne pas pouvoir être ajustées après coup en fonction de ce qui
+  sortira. Les seules valeurs chiffrées présentes à ce stade sont <strong>analytiques</strong> — calculées
+  directement depuis la distribution du corpus et l'inventaire des fichiers, sans aucun apprentissage.
+  Depuis le 2026-09-21, la section « Étape 1.1 » en contient un premier jeu, produit par
+  <code>data/metadata.py</code>.
 </div>
 
 <!-- ══════════════ PROTOCOLE ══════════════ -->
@@ -131,18 +133,81 @@ Tout modèle doit être comparé à cette ligne.</p>
 
 <!-- ══════════════ ÉTAPE 1.1 ══════════════ -->
 <h2>Étape 1.1 — Contrôles du pipeline de données</h2>
-<p class="byline"><span class="pill pending">en attente</span></p>
+<p class="byline"><span class="pill pending">partiellement mesuré</span> — <code>data/metadata.py</code>
+livré le 2026-09-21, découpage et prétraitement non encore implémentés</p>
 <p>Ces contrôles ne sont pas des résultats de performance : ce sont les <strong>garanties</strong> sans
 lesquelles aucun chiffre des étapes suivantes n'est interprétable.</p>
 
 <h3>Intégrité du découpage</h3>
 <table>
 <tr><th>Contrôle</th><th>Attendu</th><th>Mesuré</th><th>Statut</th></tr>
-<tr><td>Patients reconstitués depuis le CSV</td><td>&lt; 225 (images &gt; patients)</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
-<tr><td>Patients présents en train ET en test</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
-<tr><td>Grades représentés dans chaque pli</td><td>4 / 4</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
-<tr><td>Images perdues au prétraitement</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente</span></td></tr>
+<tr><td>Lignes lues dans le CSV</td><td>225</td><td><strong>225</strong></td><td><span class="pill ok">conforme</span></td></tr>
+<tr><td>Images référencées présentes sur disque</td><td>225 / 225</td><td><strong>225 / 225</strong></td><td><span class="pill ok">conforme</span></td></tr>
+<tr><td>Images sur disque sans ligne au CSV</td><td>0</td><td><strong>0</strong></td><td><span class="pill ok">conforme</span></td></tr>
+<tr><td>Identifiants d'image dupliqués</td><td>0</td><td><strong>0</strong></td><td><span class="pill ok">conforme</span></td></tr>
+<tr><td><strong>Patients reconstitués depuis le CSV</strong></td><td>&lt; 225 (images &gt; patients)</td><td><strong>89</strong> — 2,53 images/patient</td><td><span class="pill ok">conforme</span></td></tr>
+<tr><td>Confusion centre / appareil</td><td>1 appareil par centre</td><td><strong>4 / 4</strong> centres mono-appareil</td><td><span class="pill no">confirmée</span></td></tr>
+<tr><td>Patients présents en train ET en test</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente — <code>splits.py</code></span></td></tr>
+<tr><td>Grades représentés dans chaque pli</td><td>4 / 4</td><td class="na">—</td><td><span class="pill pending">en attente — <code>splits.py</code></span></td></tr>
+<tr><td>Images perdues au prétraitement</td><td>0</td><td class="na">—</td><td><span class="pill pending">en attente — <code>preprocess.py</code></span></td></tr>
 </table>
+<p class="note">Valeurs <strong>analytiques</strong> : elles se déduisent de la lecture du CSV et de
+l'inventaire du dossier d'images, sans entraînement ni tirage aléatoire, et sont reproductibles par
+<code>python -m sjogren.data.metadata</code>. Aucun <code>run_id</code> ne leur est associé, conformément
+à l'exception prévue par le protocole. La confusion centre/appareil est marquée « confirmée » et non
+« conforme » : c'est un fait défavorable du corpus, vérifié et non corrigeable.
+Depuis le 2026-09-21, chacune de ces valeurs est <strong>verrouillée par un test automatique</strong>
+(<code>tests/test_metadata.py</code>) : si elle change, le test échoue et c'est cette page qu'il faut
+corriger, pas le test qu'il faut assouplir.</p>
+
+<h3>Tests d'intégrité automatiques</h3>
+<table>
+<tr><th>Suite</th><th>Périmètre</th><th>Tests</th><th>Résultat</th></tr>
+<tr>
+  <td><code>tests/test_metadata.py</code></td>
+  <td>Intégrité du corpus · déterminisme de l'identité patient · détection des collisions ·
+  typage entier <em>nullable</em> · anomalies de domaine</td>
+  <td>23</td>
+  <td><span class="pill ok">23 / 23 passants</span></td>
+</tr>
+<tr>
+  <td><code>tests/test_splits.py</code></td>
+  <td>Aucun patient partagé entre plis · 4 grades par pli</td>
+  <td class="na">—</td>
+  <td><span class="pill pending">en attente — <code>splits.py</code></span></td>
+</tr>
+</table>
+<p class="note">Sept des 23 tests s'exécutent sur le corpus réel et se sautent proprement s'il est
+absent ; les seize autres tournent sur des corpus factices construits en mémoire, et couvrent des cas
+que le corpus réel ne contient pas — notamment une valeur manquante dans une colonne de grade.
+Commande : <code>python tests/test_metadata.py</code>.</p>
+
+<h3>Qualité de la reconstitution d'identité patient</h3>
+<p>Le CSV n'a pas d'identifiant patient. La signature <code>centre + sexe + âge + durée de maladie</code>
+en tient lieu. Ces chiffres mesurent ce que cette approximation coûte.</p>
+<table>
+<tr><th>Indicateur</th><th>Valeur</th><th>Lecture</th></tr>
+<tr><td>Groupes reconstitués</td><td><strong>89</strong></td><td>borne <em>inférieure</em> du nombre réel de patients</td></tr>
+<tr><td>Taille des groupes</td><td>de 1 à 8 images<br><span class="na">20×1 · 30×2 · 19×3 · 17×4 · 2×6 · 1×8</span></td><td>au-delà de 4 (2 glandes × 2 côtés), la fusion de patients est quasi certaine</td></tr>
+<tr><td>Groupes de plus de 4 images</td><td>3</td><td>indice fort de fusion</td></tr>
+<tr><td>Groupes avec &gt; 2 images d'une même glande</td><td>6</td><td>indice fort — un patient n'a que deux parotides</td></tr>
+<tr><td>Groupes à identifiants non contigus</td><td>9</td><td>indice <em>heuristique</em>, fondé sur une régularité de numérotation non documentée</td></tr>
+<tr><td><strong>Groupes portant au moins un indice</strong></td><td><strong>12 / 89</strong></td><td>13,5 % des groupes sont d'identité douteuse</td></tr>
+<tr><td>Champ dégénéré</td><td><code>disease duration</code> = 0 pour les 50 images de Ljubljana</td><td>la signature y perd une dimension : sur-regroupement accru sur ce centre</td></tr>
+<tr><td>Valeurs hors domaine</td><td>1 ligne : <code>acr_eular_2016</code> = 2 (domaine {0,1})</td><td>signalée, non corrigée — colonne ni cible ni entrée</td></tr>
+</table>
+
+<div class="callout">
+  <div class="ct">📌 Pourquoi ces collisions ne compromettent pas le découpage</div>
+  La signature démographique ne peut commettre qu'une seule erreur : <strong>fusionner</strong> des
+  patients distincts. Elle ne peut jamais <strong>scinder</strong> un patient réel, puisque deux images
+  d'une même personne partagent forcément les quatre champs. Or c'est la scission qui crée la fuite.
+  Les 12 groupes douteux coûtent donc de la puissance statistique — moins de groupes indépendants pour
+  le <em>k</em>-fold et le bootstrap — sans jamais optimiser artificiellement une performance.
+  Les intervalles de confiance qui en découleront seront <em>plutôt trop larges</em>, ce qui est
+  l'erreur acceptable. Aucune heuristique de dé-fusion n'est appliquée : elle risquerait de scinder
+  un patient réel, exactement l'erreur que le découpage groupé existe pour empêcher.
+</div>
 
 <h3>Nettoyage des artefacts d'acquisition</h3>
 <table>
@@ -294,17 +359,45 @@ exclusivement sur les tableaux ci-dessus.</p>
   <li><strong>Limites intrinsèques des méthodes d'explication</strong> — SHAP dépend du choix des données
   de référence, LIME de la segmentation en superpixels. Les mesures de stabilité de l'étape 1.4 sont là
   pour borner ce que ces méthodes permettent d'affirmer.</li>
-  <li><strong>Prochaine étape</strong> — étape 1.1 : reconstitution de l'identité patient, découpage
-  groupé, nettoyage des artefacts. Les premiers chiffres attendus sur cette page sont les contrôles
-  d'intégrité du découpage.</li>
+  <li><strong>Identité patient approximative</strong> — le corpus n'a pas d'identifiant patient.
+  Les 89 groupes reconstitués sont une borne inférieure : 12 d'entre eux portent un indice de fusion de
+  patients distincts, et la signature est dégénérée à Ljubljana. Le découpage reste sûr — la clé
+  sur-regroupe sans jamais scinder — mais le nombre de groupes indépendants est surestimé à la baisse,
+  ce qui élargira les intervalles de confiance. Cette limite est structurelle et ne peut pas être levée
+  à partir des données disponibles.</li>
+  <li><strong>Prochaine étape</strong> — suite de l'étape 1.1 : découpage groupé par patient
+  (<code>splits.py</code>), nettoyage des artefacts d'acquisition et normalisation d'intensité
+  (<code>preprocess.py</code>). Les prochains chiffres attendus sur cette page sont les contrôles
+  d'intégrité du découpage et le taux de surface conservée par appareil.</li>
 </ul>
 
 <!-- ══════════════ JOURNAL DES RUNS ══════════════ -->
 <h2>Journal des runs</h2>
-<p>Un enregistrement par exécution produisant un chiffre affiché sur cette page.</p>
+<p>Un enregistrement par exécution produisant un chiffre affiché sur cette page. Les valeurs
+<strong>analytiques</strong> n'y figurent pas : elles ne proviennent pas d'un entraînement et sont
+reproductibles par une commande déterministe, indiquée en regard.</p>
 <table>
 <tr><th>run_id</th><th>Date</th><th>Étape</th><th>Configuration</th><th>Sortie</th></tr>
-<tr><td colspan="5" style="text-align:center;color:var(--muted)">Aucun run enregistré à ce jour.</td></tr>
+<tr><td colspan="5" style="text-align:center;color:var(--muted)">Aucun run d'entraînement enregistré à ce jour.</td></tr>
+</table>
+
+<h3>Mesures analytiques reproductibles</h3>
+<table>
+<tr><th>Date</th><th>Étape</th><th>Commande</th><th>Chiffres produits</th></tr>
+<tr>
+  <td><code>2026-09-21</code></td>
+  <td>1.1</td>
+  <td><code>python -m sjogren.data.metadata</code></td>
+  <td>Intégrité du CSV et des fichiers (225/225) · 89 patients reconstitués · distribution des tailles
+  de groupe · 12 groupes à identité douteuse · champ dégénéré à Ljubljana · 1 valeur hors domaine</td>
+</tr>
+<tr>
+  <td><code>2026-09-21</code></td>
+  <td>1.1</td>
+  <td><code>python tests/test_metadata.py</code></td>
+  <td>23 / 23 tests passants — verrouillage des valeurs ci-dessus et des invariants du module de
+  métadonnées</td>
+</tr>
 </table>
 
 <footer>
