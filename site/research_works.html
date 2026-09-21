@@ -107,6 +107,13 @@ pre code{font-family:var(--mono); color:#c9d1d9; background:none; padding:0}
 .mermaid-box{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:1.2rem; margin:1rem 0; overflow-x:auto}
 .mermaid{display:flex; justify-content:center}
 pre.mermaid{background:transparent; border:none; padding:0; margin:0}
+.mermaid-box [id^="flowchart-"] .node{cursor:help}
+.mermaidTooltip{
+  position:absolute; z-index:60; max-width:260px; padding:.5rem .7rem;
+  background:var(--panel2); color:var(--text); border:1px solid var(--border);
+  border-radius:8px; font-size:.82rem; line-height:1.35; font-family:inherit;
+  box-shadow:0 8px 20px rgba(0,0,0,.35); pointer-events:none;
+}
 .fig-cap{text-align:center; font-size:.78rem; color:var(--muted); margin-top:.6rem}
 
 ol,ul{margin:.5rem 0 1rem 1.4rem}
@@ -449,6 +456,19 @@ flowchart LR
   style D fill:#2a1f3d,stroke:#a78bfa,color:#dbe2f0
   style ANA fill:#4a1d1d,stroke:#f87171,stroke-width:2px,color:#dbe2f0
   style P2 stroke-dasharray: 5 5
+  click RAW noop "Image d'échographie des glandes salivaires (SGUS) telle qu'acquise par l'appareil, avant tout traitement."
+  click CLEAN noop "Suppression des incrustations (texte, bords de sonde) et normalisation de l'intensité des pixels."
+  click META noop "Fichier CSV des métadonnées cliniques : identifiant patient, centre, grade De Vita, type de glande, appareil."
+  click SPLIT noop "Découpage entraînement/validation/test par StratifiedGroupKFold : un même patient ne peut apparaître dans plusieurs plis."
+  click CNN noop "Réseau convolutif entraîné from scratch, sans poids pré-entraînés — référence basse de la comparaison."
+  click RES noop "ResNet18/50 pré-entraîné sur ImageNet, affiné par transfer learning sur le corpus SGUS."
+  click VIT noop "Vision Transformer : architecture à base d'attention appliquée aux patches de l'image."
+  click EV noop "Validation croisée groupée par patient, intervalles de confiance par bootstrap, et leave-one-center-out (LOCO) pour tester la généralisation inter-site."
+  click SHAP noop "SHapley Additive exPlanations : attribution de la contribution de chaque région de l'image à la prédiction."
+  click LIME noop "Local Interpretable Model-agnostic Explanations : approximation locale par superpixels expliquant une prédiction individuelle."
+  click RHO noop "Coefficient de concordance ρ et stabilité entre les cartes d'attribution SHAP et LIME."
+  click ANA noop "Étape 1.5 — livrable à part entière : synthèse critique des performances et des limites de l'explication post-hoc. Détermine le périmètre de la phase 2."
+  click P2 noop "Phase suivante du projet ; périmètre défini à l'issue de l'étape 1.5."
   </pre>
   <div class="fig-cap">Fig. 3 — Chaîne de la phase 1. L'analyse (en rouge) conditionne l'ouverture de la phase 2.</div>
   </div>
@@ -1090,6 +1110,8 @@ flowchart LR
 <!-- ══════════════════ SCRIPTS ══════════════════ -->
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+window.noop = () => {}; // cible des directives "click" mermaid utilisées uniquement pour l'infobulle au survol
 
 const nodes = [...document.querySelectorAll('.mermaid')];
 const decode = html => { const t = document.createElement('textarea'); t.innerHTML = html; return t.value; };
