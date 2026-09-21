@@ -180,7 +180,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
   <div class="group">Comprendre</div>
   <a href="#apercu">1 · Vue d'ensemble</a>
   <a href="#clinique">2 · Cadre clinique</a>
-  <a href="#donnees">3 · Jeu de données</a>
+  <a href="#donnees">3 · Dataset</a>
   <div class="group">Phase 1</div>
   <a href="#phase1">4 · Vue de la phase 1</a>
   <a href="#e11">5 · 1.1 Pipeline de données</a>
@@ -277,7 +277,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 
   <h3>2.2 Le score de De Vita (0-3)</h3>
   <p>Score semi-quantitatif de référence, gradant l'atteinte parenchymateuse par paliers. C'est la
-  <strong>variable cible</strong> du projet. Le jeu de données fournit également le score OMERACT,
+  <strong>variable cible</strong> du projet. Le Dataset fournit également le score OMERACT,
   qui pourra servir de contrôle de cohérence.</p>
 
   <div class="callout warn">
@@ -292,7 +292,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 
 <!-- ══════════════════ 3. DONNÉES ══════════════════ -->
 <section id="donnees">
-  <h2>3 · Jeu de données — HarmonicSS SGUS benchmark</h2>
+  <h2>3 · Dataset — HarmonicSS SGUS benchmark</h2>
 
   <p>Corpus public issu d'une étude de fiabilité multicentrique européenne
   (<a href="https://doi.org/10.3389/fmed.2020.581248" style="color:var(--accent2)">doi:10.3389/fmed.2020.581248</a>),
@@ -319,7 +319,7 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
       <button class="seg-btn" data-dist="appareil" type="button">Appareil</button>
       <button class="seg-btn" data-dist="glande" type="button">Type de glande</button>
     </div>
-    <canvas id="distCanvas" height="260" aria-label="Distribution du jeu de données"></canvas>
+    <canvas id="distCanvas" height="260" aria-label="Distribution du Dataset"></canvas>
     <div class="fig-cap" id="dist-cap">Fig. 1 — Distribution des grades De Vita sur les 225 images.</div>
   </div>
 
@@ -878,7 +878,7 @@ flowchart LR
   <div class="callout danger">
     <div class="ct">🚫 Ce document ne contient aucun résultat expérimental</div>
     À ce stade, <strong>aucun modèle n'a été entraîné</strong>. Les seuls chiffres présentés sont des
-    <em>statistiques descriptives du jeu de données</em>, mesurées sur le CSV, et des valeurs calculées
+    <em>statistiques descriptives du Dataset</em>, mesurées sur le CSV, et des valeurs calculées
     analytiquement (poids de classes, performance du classifieur trivial). Toute cellule de performance
     reste vide jusqu'à la production d'un run tracé.
   </div>
@@ -1079,7 +1079,7 @@ flowchart LR
   <footer>
     Document de suivi du projet SGUS-DL — gradation du syndrome de Gougerot-Sjögren sur échographie
     des glandes salivaires · Auteur : Houssem Eddine Lassoued · Encadrement : Dr. Anis Ben Aicha et
-    Pr. Habib Fathallah · Les statistiques du corpus sont mesurées sur le CSV du jeu de données ;
+    Pr. Habib Fathallah · Les statistiques du corpus sont mesurées sur le CSV du Dataset ;
     aucun résultat de modèle n'est encore disponible à ce stade.
   </footer>
 </section>
