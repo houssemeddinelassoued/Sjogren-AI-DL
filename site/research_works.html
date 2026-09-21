@@ -73,24 +73,34 @@ em{color:var(--warn); font-style:normal}
 .card .d{font-size:.84rem; color:var(--muted)}
 .card-media{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1.1rem}
 .card-media .card-text{flex:1 1 170px; min-width:150px}
-.thumb-stack{display:flex; flex:0 0 auto; height:56px; padding-right:16px}
+.thumb-stack{display:flex; flex:0 0 auto; height:44px}
 .thumb-stack .thumb{
-  position:relative; width:40px; height:40px; object-fit:cover; border-radius:7px;
-  border:2px solid var(--panel); box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:zoom-in;
-  margin-left:-16px; transition:transform .15s ease, box-shadow .15s ease, z-index 0s;
+  position:relative; width:38px; height:38px; object-fit:cover; border-radius:6px;
+  border:2px solid var(--panel); box-shadow:0 2px 6px rgba(0,0,0,.3); cursor:zoom-in;
+  margin-left:-12px; transition:transform .15s ease, box-shadow .15s ease, z-index 0s;
 }
 .thumb-stack .thumb:first-child{margin-left:0}
-.thumb-stack .thumb:nth-child(odd){transform:rotate(-6deg)}
-.thumb-stack .thumb:nth-child(even){transform:rotate(5deg)}
-.thumb-stack .thumb:hover{transform:rotate(0deg) translateY(-8px) scale(1.4); z-index:9; box-shadow:0 8px 16px rgba(0,0,0,.45)}
+.thumb-stack .thumb:hover{transform:translateY(-6px) scale(1.3); z-index:9; box-shadow:0 8px 16px rgba(0,0,0,.4)}
 .img-modal{position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(5,7,12,.82); padding:2rem}
 .img-modal.open{display:flex}
-.img-modal img{max-width:min(90vw,720px); max-height:82vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.55); border:1px solid var(--border)}
+.img-modal img{max-width:min(86vw,720px); max-height:82vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.55); border:1px solid var(--border)}
 .img-modal-cap{position:absolute; bottom:1.3rem; left:0; right:0; text-align:center; color:var(--text); font-size:.85rem}
 .img-modal-close{
   position:absolute; top:1rem; right:1.2rem; width:36px; height:36px; border-radius:50%;
   background:var(--panel2); border:1px solid var(--border); color:var(--text); font-size:1.05rem;
   cursor:pointer; line-height:1;
+}
+.img-modal-nav{
+  position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%;
+  background:var(--panel2); border:1px solid var(--border); color:var(--text); font-size:1.3rem;
+  cursor:pointer; line-height:1; display:flex; align-items:center; justify-content:center;
+}
+.img-modal-nav:hover{background:var(--accent); color:var(--bg); border-color:var(--accent)}
+.img-modal-prev{left:1rem}
+.img-modal-next{right:1rem}
+@media(max-width:520px){
+  .img-modal-nav{width:36px; height:36px; font-size:1.1rem}
+  .img-modal-prev{left:.4rem} .img-modal-next{right:.4rem}
 }
 .badge{display:inline-block; font-size:.7rem; padding:.15rem .55rem; border-radius:999px; border:1px solid var(--border); color:var(--muted); margin-right:.35rem}
 .badge.ok{color:var(--ok); border-color:var(--ok)}
@@ -199,7 +209,9 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
 <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Activer le thème clair" title="Activer le thème clair">☀</button>
 <div class="img-modal" id="imgModal" role="dialog" aria-modal="true" aria-hidden="true">
   <button class="img-modal-close" id="imgModalClose" type="button" aria-label="Fermer">✕</button>
+  <button class="img-modal-nav img-modal-prev" id="imgModalPrev" type="button" aria-label="Image précédente">‹</button>
   <img id="imgModalPic" src="" alt="">
+  <button class="img-modal-nav img-modal-next" id="imgModalNext" type="button" aria-label="Image suivante">›</button>
   <div class="img-modal-cap" id="imgModalCap"></div>
 </div>
 <div style="background:#0e1620;color:#5eead4;padding:.6rem 1.2rem;font-size:.85rem;text-align:center;font-family:sans-serif;border-bottom:1px solid #1f293d">
@@ -341,14 +353,14 @@ if (localStorage.getItem('sgus-theme') !== 'dark') document.documentElement.clas
         <div class="d">JPG, <code>001.jpg</code> … <code>225.jpg</code>, indexées par la colonne
         <code>Anonymized ID</code> du CSV (séparateur <code>;</code>).</div></div>
       <div class="thumb-stack" id="thumbStack">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/001.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/001.jpg" alt="SGUS 001 — Udine, grade De Vita 3">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/009.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/009.jpg" alt="SGUS 009 — Udine, grade De Vita 2">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/076.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/076.jpg" alt="SGUS 076 — Ljubljana, grade De Vita 2">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/100.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/100.jpg" alt="SGUS 100 — Ljubljana, grade De Vita 0">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/127.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/127.jpg" alt="SGUS 127 — Milano, grade De Vita 3">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/150.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/150.jpg" alt="SGUS 150 — Milano, grade De Vita 0">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/174.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/174.jpg" alt="SGUS 174 — Belgrade, grade De Vita 1">
-        <img class="thumb" loading="lazy" decoding="async" src="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/200.jpg" data-full="../HarmonicSS%20benchmark%20dataset/Anonymized%20images/200.jpg" alt="SGUS 200 — Belgrade, grade De Vita 0">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/001.jpg" data-full="assets/dataset-samples/001.jpg" alt="SGUS 001 — Udine, grade De Vita 3">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/009.jpg" data-full="assets/dataset-samples/009.jpg" alt="SGUS 009 — Udine, grade De Vita 2">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/076.jpg" data-full="assets/dataset-samples/076.jpg" alt="SGUS 076 — Ljubljana, grade De Vita 2">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/100.jpg" data-full="assets/dataset-samples/100.jpg" alt="SGUS 100 — Ljubljana, grade De Vita 0">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/127.jpg" data-full="assets/dataset-samples/127.jpg" alt="SGUS 127 — Milano, grade De Vita 3">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/150.jpg" data-full="assets/dataset-samples/150.jpg" alt="SGUS 150 — Milano, grade De Vita 0">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/174.jpg" data-full="assets/dataset-samples/174.jpg" alt="SGUS 174 — Belgrade, grade De Vita 1">
+        <img class="thumb" loading="lazy" decoding="async" src="assets/dataset-samples/200.jpg" data-full="assets/dataset-samples/200.jpg" alt="SGUS 200 — Belgrade, grade De Vita 0">
       </div>
     </div>
     <div class="card"><div class="k">4</div><div class="t">grades cibles</div>
@@ -1235,14 +1247,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-  /* ── pile de miniatures du dataset → popup agrandie ── */
+  /* ── pile de miniatures du dataset → popup agrandie avec navigation ── */
   const imgModal = $('imgModal');
   const imgModalPic = $('imgModalPic');
   const imgModalCap = $('imgModalCap');
-  const openImgModal = (src, caption) => {
-    imgModalPic.src = src;
-    imgModalPic.alt = caption || '';
-    imgModalCap.textContent = caption || '';
+  const galleryImgs = [...document.querySelectorAll('.thumb-stack .thumb')];
+  const gallery = galleryImgs.map(img => ({src: img.dataset.full, caption: img.alt}));
+  let galleryIndex = 0;
+  const showGalleryImage = i => {
+    galleryIndex = (i + gallery.length) % gallery.length;
+    const item = gallery[galleryIndex];
+    imgModalPic.src = item.src;
+    imgModalPic.alt = item.caption;
+    imgModalCap.textContent = item.caption;
+  };
+  const openImgModal = i => {
+    showGalleryImage(i);
     imgModal.classList.add('open');
     imgModal.setAttribute('aria-hidden', 'false');
   };
@@ -1251,12 +1271,17 @@ document.addEventListener('DOMContentLoaded', () => {
     imgModal.setAttribute('aria-hidden', 'true');
     imgModalPic.src = '';
   };
-  document.querySelectorAll('.thumb-stack .thumb').forEach(img => {
-    img.addEventListener('click', () => openImgModal(img.dataset.full, img.alt));
-  });
+  galleryImgs.forEach((img, i) => img.addEventListener('click', () => openImgModal(i)));
   imgModal.addEventListener('click', e => { if (e.target === imgModal) closeImgModal(); });
   $('imgModalClose').addEventListener('click', closeImgModal);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImgModal(); });
+  $('imgModalPrev').addEventListener('click', () => showGalleryImage(galleryIndex - 1));
+  $('imgModalNext').addEventListener('click', () => showGalleryImage(galleryIndex + 1));
+  document.addEventListener('keydown', e => {
+    if (!imgModal.classList.contains('open')) return;
+    if (e.key === 'Escape') closeImgModal();
+    else if (e.key === 'ArrowLeft') showGalleryImage(galleryIndex - 1);
+    else if (e.key === 'ArrowRight') showGalleryImage(galleryIndex + 1);
+  });
 
   /* ══════════ Distributions réelles du corpus ══════════ */
   // Effectifs mesurés sur "Anonymized images - Info.csv" (225 lignes).
