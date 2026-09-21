@@ -85,7 +85,7 @@ Aucune dépendance au-delà de ce périmètre n'est introduite tant que la phase
 
 ### Critère de sortie :
 
-Un `DataLoader` opérationnel, une planche de contrôle visuel des régions extraites pour chacun des quatre appareils, et les contrôles d'intégrité au vert et reportés dans `results.html`.
+Un `DataLoader` opérationnel, une planche de contrôle visuel des régions extraites pour chacun des quatre appareils, et les contrôles d'intégrité au vert et reportés dans `site/results.html`.
 
 ## Étape 1.2 — Modèles boîte noire
 
@@ -117,7 +117,7 @@ Pour chaque architecture, un modèle entraîné, sauvegardé, et un `run_id` tra
 
 ### Critère de sortie :
 
-Tous les tableaux de performance de `results.html` renseignés, chaque cellule tracée par un `run_id`.
+Tous les tableaux de performance de `site/results.html` renseignés, chaque cellule tracée par un `run_id`.
 
 ## Étape 1.4 — Explication post-hoc
 
@@ -134,7 +134,7 @@ Tous les tableaux de performance de `results.html` renseignés, chaque cellule t
 
 ### Critère de sortie :
 
-Cartes exportées en haute résolution pour le manuscrit, valeurs de ρ, de concordance et de stabilité reportées dans `results.html`.
+Cartes exportées en haute résolution pour le manuscrit, valeurs de ρ, de concordance et de stabilité reportées dans `site/results.html`.
 
 ## Étape 1.5 — Analyse, interprétation et limites
 
@@ -150,7 +150,7 @@ Cartes exportées en haute résolution pour le manuscrit, valeurs de ρ, de conc
 
 ### Critère de sortie :
 
-Une section d'analyse rédigée dans `research_works.html` et une section « Limites » à jour dans `results.html`, toutes deux défendables devant l'encadrant et réutilisables dans le manuscrit.
+Une section d'analyse rédigée dans `site/research_works.html` et une section « Limites » à jour dans `site/results.html`, toutes deux défendables devant l'encadrant et réutilisables dans le manuscrit.
 
 ---
 
@@ -174,22 +174,22 @@ Deux pages HTML à la racine du projet constituent la vitrine et la mémoire des
 
 | Fichier | Rôle | Contenu |
 |---|---|---|
-| `research_works.html` | Méthodologie et suivi | Cadre clinique, données, phase 1 détaillée, justification des choix, statut, feuille de route, journal des travaux |
-| `results.html` | Résultats chiffrés | Toutes les mesures, étape par étape, avec intervalles de confiance et `run_id` de traçabilité |
+| `site/research_works.html` | Méthodologie et suivi | Cadre clinique, données, phase 1 détaillée, justification des choix, statut, feuille de route, journal des travaux |
+| `site/results.html` | Résultats chiffrés | Toutes les mesures, étape par étape, avec intervalles de confiance et `run_id` de traçabilité |
 
 ### Règle de mise à jour
 
 **Toute modification du code, tout résultat produit et tout avancement d'étape doit être répercuté dans ces deux fichiers dans la même session de travail.** Concrètement :
 
-- **Nouveau module écrit ou modifié** → mettre à jour le tableau des livrables de l'étape concernée et l'arborescence de code dans `research_works.html` (badge `à faire` → `fait`).
-- **Run produisant des chiffres** → renseigner les cellules correspondantes dans `results.html`, ajouter une ligne au journal des runs avec le `run_id`, et mettre à jour le tableau de bord de `research_works.html`.
+- **Nouveau module écrit ou modifié** → mettre à jour le tableau des livrables de l'étape concernée et l'arborescence de code dans `site/research_works.html` (badge `à faire` → `fait`).
+- **Run produisant des chiffres** → renseigner les cellules correspondantes dans `site/results.html`, ajouter une ligne au journal des runs avec le `run_id`, et mettre à jour le tableau de bord de `site/research_works.html`.
 - **Étape franchie** → mettre à jour la section Statut, le diagramme de trajectoire et le journal des travaux.
 - **Décision méthodologique** → consigner la décision et sa justification, datée dans le journal.
 - **Résultat négatif ou décevant** → le consigner tel quel. Ne jamais effacer ni réécrire une affirmation antérieure : ajouter un avertissement daté qui explique ce qui l'invalide.
 
 ### Règles de contenu
 
-- Aucun chiffre de performance dans `results.html` sans un `run_id` traçable vers `outputs/<run_id>/metrics.json`. Seule exception : les valeurs **analytiques** calculées directement depuis la distribution du corpus, étiquetées comme telles.
+- Aucun chiffre de performance dans `site/results.html` sans un `run_id` traçable vers `outputs/<run_id>/metrics.json`. Seule exception : les valeurs **analytiques** calculées directement depuis la distribution du corpus, étiquetées comme telles.
 - Les conditions d'évaluation (métriques, schéma de validation, seuils) sont fixées **avant** la mesure et ne sont pas ajustées après coup.
 - **Ne rien documenter qui ne soit pas arrêté.** Les pistes non validées sont signalées comme telles ou tenues hors des documents — une page de suivi qui décrit des travaux non engagés induit en erreur sur l'état réel du projet.
 - Les deux pages doivent rester cohérentes entre elles.

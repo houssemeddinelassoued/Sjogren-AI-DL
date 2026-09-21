@@ -42,20 +42,20 @@ et ce que les méthodes d'explication peuvent ou ne peuvent pas établir.
 
 ## Documents vivants — obligation permanente
 
-Deux pages HTML à la racine du projet doivent **refléter l'état réel du projet à tout moment** :
+Deux pages HTML dans `site/` doivent **refléter l'état réel du projet à tout moment** :
 
 | Fichier | Rôle |
 |---|---|
-| `research_works.html` | Méthodologie, justification des choix, statut des étapes, feuille de route, journal des travaux |
-| `results.html` | Tous les résultats chiffrés, étape par étape, avec intervalles de confiance et `run_id` |
+| `site/research_works.html` | Méthodologie, justification des choix, statut des étapes, feuille de route, journal des travaux |
+| `site/results.html` | Tous les résultats chiffrés, étape par étape, avec intervalles de confiance et `run_id` |
 
 **Tu dois les mettre à jour dans la même session que le travail concerné**, sans attendre qu'on te le
 demande. Avant de conclure une tâche, vérifie systématiquement :
 
 - **Module écrit ou modifié** → tableau des livrables de l'étape et arborescence de code dans
-  `research_works.html` (badge `à faire` → `fait`).
-- **Run produisant des chiffres** → cellules correspondantes dans `results.html`, ligne au journal des
-  runs avec le `run_id`, et tableau de bord de `research_works.html`.
+  `site/research_works.html` (badge `à faire` → `fait`).
+- **Run produisant des chiffres** → cellules correspondantes dans `site/results.html`, ligne au journal des
+  runs avec le `run_id`, et tableau de bord de `site/research_works.html`.
 - **Étape franchie** → section Statut, diagramme de trajectoire et journal des travaux.
 - **Décision méthodologique** → consignée et datée dans le journal des travaux.
 - **Résultat négatif** → consigné tel quel. Ne jamais effacer une affirmation antérieure devenue
